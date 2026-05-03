@@ -138,14 +138,8 @@ function Hero() {
           hoje — corpo, alma e espírito.
         </p>
 
-        <div className="flex flex-col sm:flex-row gap-4 mt-10 animate-fade-up">
+        <div className="flex justify-center mt-10 animate-fade-up">
           <CTA variant="primary">Quero Meu Ebook Agora</CTA>
-          <a
-            href="#receitas"
-            className={`${ctaClasses} border-2 border-white/80 text-white hover:bg-white hover:text-foreground`}
-          >
-            Ver o que tem dentro
-          </a>
         </div>
 
         <p className="mt-8 font-sans text-xs uppercase tracking-widest text-white/60">
