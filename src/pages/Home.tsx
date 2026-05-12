@@ -630,6 +630,14 @@ function Footer() {
             </li>
             <li>
               <a
+                href="/leads"
+                className="hover:text-accent transition-colors"
+              >
+                Guia Gratuito (PDF)
+              </a>
+            </li>
+            <li>
+              <a
                 href={HOTMART_URL}
                 className="hover:text-accent transition-colors"
               >
