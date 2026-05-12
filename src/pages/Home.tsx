@@ -508,12 +508,31 @@ function Bonus() {
         </div>
 
         <div className="mb-12 max-w-4xl mx-auto">
-          <img
-            src="/images/bundle-completo.png"
-            alt="Bundle completo: ebook principal + guia gratuito + plano de 7 dias + lista de compras"
-            loading="lazy"
-            className="w-full drop-shadow-2xl"
-          />
+          <div
+            className="relative rounded-3xl overflow-hidden border-2 border-accent/20 shadow-2xl"
+            style={{
+              background:
+                "radial-gradient(ellipse at center, #3D2817 0%, #2A1B0F 100%)",
+            }}
+          >
+            <div
+              className="absolute inset-0 pointer-events-none opacity-40"
+              style={{
+                background:
+                  "radial-gradient(circle at 50% 50%, rgba(212, 175, 55, 0.18) 0%, transparent 60%)",
+              }}
+              aria-hidden="true"
+            />
+            <img
+              src="/images/bundle-completo.png"
+              alt="Bundle completo: ebook principal + guia gratuito + plano de 7 dias + lista de compras"
+              loading="lazy"
+              className="relative w-full h-auto block"
+            />
+          </div>
+          <p className="text-center font-sans text-sm text-white/60 mt-4 italic">
+            Tudo o que você recebe ao adquirir hoje
+          </p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
