@@ -49,11 +49,22 @@ export default {
       animation: {
         "bounce-slow": "bounce 2.5s infinite",
         "fade-up": "fadeUp 0.8s ease-out forwards",
+        "pulse-slow": "pulseSlow 2.5s ease-in-out infinite",
       },
       keyframes: {
         fadeUp: {
           "0%": { opacity: "0", transform: "translateY(20px)" },
           "100%": { opacity: "1", transform: "translateY(0)" },
+        },
+        pulseSlow: {
+          "0%, 100%": {
+            transform: "scale(1)",
+            boxShadow: "0 10px 40px -10px rgba(212, 175, 55, 0.45)",
+          },
+          "50%": {
+            transform: "scale(1.03)",
+            boxShadow: "0 15px 50px -10px rgba(212, 175, 55, 0.7)",
+          },
         },
       },
     },
