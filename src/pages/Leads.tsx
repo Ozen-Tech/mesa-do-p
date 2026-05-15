@@ -9,7 +9,8 @@ import {
   Sparkles,
 } from "lucide-react";
 
-const HOTMART_URL = "https://pay.hotmart.com/G105661402K?checkoutMode=2";
+const HOTMART_URL =
+  "https://pay.hotmart.com/G105661402K?checkoutMode=10";
 const PDF_URL = "/downloads/guia-dos-alimentos-da-biblia.pdf";
 
 const SEGREDOS = [
@@ -81,7 +82,7 @@ export default function Leads() {
             <div className="mt-10 flex flex-col sm:flex-row gap-4 items-center justify-center lg:justify-start">
               <button
                 onClick={handleDownload}
-                className="hotmart-fb inline-flex items-center justify-center gap-3 px-8 py-4 rounded-full font-sans font-medium tracking-wide bg-accent text-foreground hover:bg-accent-300 shadow-gold hover:shadow-2xl hover:-translate-y-0.5 transition-all duration-300 cursor-pointer"
+                className="inline-flex items-center justify-center gap-3 px-8 py-4 rounded-full font-sans font-medium tracking-wide bg-accent text-foreground hover:bg-accent-300 shadow-gold hover:shadow-2xl hover:-translate-y-0.5 transition-all duration-300 cursor-pointer"
               >
                 <Download className="w-5 h-5" />
                 {downloaded ? "Baixado! Baixar Novamente" : "Baixar Guia Grátis (PDF)"}
@@ -248,15 +249,7 @@ export default function Leads() {
             <div className="mt-10">
               <a
                 href={HOTMART_URL}
-                onClick={(e) => {
-                  if (
-                    typeof window !== "undefined" &&
-                    (window as any).hotmart
-                  ) {
-                    e.preventDefault();
-                  }
-                }}
-                className="hotmart-fb hotmart__button-checkout inline-flex items-center justify-center gap-3 px-8 py-4 rounded-full font-sans font-medium tracking-wide bg-accent text-foreground hover:bg-accent-300 shadow-gold hover:shadow-2xl hover:-translate-y-0.5 transition-all duration-300 cursor-pointer"
+                className="inline-flex items-center justify-center gap-3 px-8 py-4 rounded-full font-sans font-medium tracking-wide bg-accent text-foreground hover:bg-accent-300 shadow-gold hover:shadow-2xl hover:-translate-y-0.5 transition-all duration-300 cursor-pointer"
               >
                 Acessar A Mesa dos Profetas
                 <ArrowRight className="w-5 h-5" />

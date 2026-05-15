@@ -20,7 +20,8 @@ import {
   Sparkles,
 } from "lucide-react";
 
-const HOTMART_URL = "https://pay.hotmart.com/G105661402K?checkoutMode=2";
+const HOTMART_URL =
+  "https://pay.hotmart.com/G105661402K?checkoutMode=10";
 
 const PRICE_FROM = "127";
 const PRICE_TO = "67";
@@ -28,7 +29,7 @@ const PRICE_INSTALLMENTS = "6,46";
 const INSTALLMENTS_COUNT = "12";
 
 const ctaClasses =
-  "hotmart-fb hotmart__button-checkout inline-flex items-center justify-center gap-2 px-6 sm:px-10 py-4 sm:py-5 rounded-full font-sans font-bold tracking-wide transition-all duration-300 ease-out cursor-pointer uppercase text-sm sm:text-base";
+  "inline-flex items-center justify-center gap-2 px-6 sm:px-10 py-4 sm:py-5 rounded-full font-sans font-bold tracking-wide transition-all duration-300 ease-out cursor-pointer uppercase text-sm sm:text-base";
 
 type CtaProps = {
   variant?: "primary" | "secondary" | "huge";
@@ -48,11 +49,6 @@ function CTA({ variant = "primary", children, className = "" }: CtaProps) {
   return (
     <a
       href={HOTMART_URL}
-      onClick={(e) => {
-        if (typeof window !== "undefined" && (window as any).hotmart) {
-          e.preventDefault();
-        }
-      }}
       className={`${ctaClasses} ${variants[variant]} ${className}`}
     >
       {children}
