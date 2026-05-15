@@ -17,7 +17,6 @@ import {
   Award,
   ArrowRight,
   Heart,
-  Sparkles,
 } from "lucide-react";
 
 const HOTMART_URL =
@@ -56,59 +55,151 @@ function CTA({ variant = "primary", children, className = "" }: CtaProps) {
   );
 }
 
-function CountdownTimer() {
-  const [time, setTime] = useState({ h: 23, m: 59, s: 59 });
+function getTimeUntilMidnight() {
+  const now = new Date();
+  const midnight = new Date(now);
+  midnight.setHours(24, 0, 0, 0);
+  const diff = Math.max(0, midnight.getTime() - now.getTime());
+  return {
+    h: Math.floor(diff / 3_600_000),
+    m: Math.floor((diff % 3_600_000) / 60_000),
+    s: Math.floor((diff % 60_000) / 1000),
+  };
+}
+
+function getBonusSlotsLeft() {
+  const seed = new Date().getDate() + new Date().getMonth() * 31;
+  return 7 + (seed % 11);
+}
+
+function CountdownTimer({
+  compact = false,
+  light = false,
+}: {
+  compact?: boolean;
+  light?: boolean;
+}) {
+  const [time, setTime] = useState(getTimeUntilMidnight);
 
   useEffect(() => {
-    const t = setInterval(() => {
-      setTime((p) => {
-        let s = p.s - 1;
-        let m = p.m;
-        let h = p.h;
-        if (s < 0) {
-          s = 59;
-          m -= 1;
-        }
-        if (m < 0) {
-          m = 59;
-          h -= 1;
-        }
-        if (h < 0) {
-          return { h: 23, m: 59, s: 59 };
-        }
-        return { h, m, s };
-      });
-    }, 1000);
+    const tick = () => setTime(getTimeUntilMidnight());
+    tick();
+    const t = setInterval(tick, 1000);
     return () => clearInterval(t);
   }, []);
 
   const pad = (n: number) => String(n).padStart(2, "0");
+  const box = light
+    ? `bg-red-700 text-white rounded-md text-center font-mono font-bold tabular-nums ${
+        compact
+          ? "text-base px-2 py-1 min-w-[2.25rem]"
+          : "text-lg sm:text-2xl px-2.5 sm:px-3.5 py-1 sm:py-1.5 min-w-[2.75rem]"
+      }`
+    : `bg-foreground/90 text-accent rounded-md text-center font-mono font-bold tabular-nums ${
+        compact
+          ? "text-base px-2 py-1 min-w-[2.25rem]"
+          : "text-lg sm:text-2xl px-2.5 sm:px-3.5 py-1 sm:py-1.5 min-w-[2.75rem] sm:min-w-[3.25rem]"
+      }`;
+  const sep = light
+    ? "text-red-800 text-sm"
+    : compact
+      ? "text-white/70 text-sm"
+      : "text-foreground";
 
   return (
-    <div className="flex items-center gap-1.5 sm:gap-2 font-mono font-bold text-lg sm:text-2xl tabular-nums">
-      <span className="bg-foreground/90 text-accent px-2.5 sm:px-3.5 py-1 sm:py-1.5 rounded-md">
-        {pad(time.h)}
-      </span>
-      <span className="text-foreground">:</span>
-      <span className="bg-foreground/90 text-accent px-2.5 sm:px-3.5 py-1 sm:py-1.5 rounded-md">
-        {pad(time.m)}
-      </span>
-      <span className="text-foreground">:</span>
-      <span className="bg-foreground/90 text-accent px-2.5 sm:px-3.5 py-1 sm:py-1.5 rounded-md">
-        {pad(time.s)}
-      </span>
+    <div
+      className={`flex items-center gap-1 sm:gap-1.5 ${compact ? "" : "justify-center"}`}
+      role="timer"
+      aria-live="polite"
+    >
+      <span className={box}>{pad(time.h)}</span>
+      <span className={sep}>:</span>
+      <span className={box}>{pad(time.m)}</span>
+      <span className={sep}>:</span>
+      <span className={box}>{pad(time.s)}</span>
+    </div>
+  );
+}
+
+function UrgencyCountdownBlock({
+  variant = "hero",
+}: {
+  variant?: "hero" | "card" | "final";
+}) {
+  const slots = getBonusSlotsLeft();
+  const labels =
+    variant === "final"
+      ? {
+          title: "Esta condição some à meia-noite",
+          sub: `Restam ${slots} acessos com os 3 bônus inclusos hoje`,
+        }
+      : variant === "card"
+        ? {
+            title: "Preço promocional encerra hoje",
+            sub: "Depois volta para R$ 127 sem os bônus",
+          }
+        : {
+            title: "Bônus de R$ 111 somem à meia-noite",
+            sub: `Só ${slots} acessos com desconto + 3 presentes hoje`,
+          };
+
+  return (
+    <div
+      className={
+        variant === "card"
+          ? "mt-6 p-4 rounded-2xl bg-red-50 border-2 border-red-200"
+          : variant === "final"
+            ? "mt-6 inline-flex flex-col items-center gap-3"
+            : "flex flex-col items-center gap-3"
+      }
+    >
+      <div className="flex items-center gap-2 flex-wrap justify-center">
+        <Flame
+          className={`w-5 h-5 animate-pulse flex-shrink-0 ${
+            variant === "card" ? "text-red-600" : "text-red-400"
+          }`}
+        />
+        <span
+          className={`font-sans font-bold uppercase tracking-wide text-center ${
+            variant === "card"
+              ? "text-xs sm:text-sm text-red-800"
+              : variant === "hero"
+                ? "text-sm text-white"
+                : "text-xs sm:text-sm text-white/95"
+          }`}
+        >
+          {labels.title}
+        </span>
+      </div>
+      <CountdownTimer
+        compact={variant !== "final"}
+        light={variant === "card"}
+      />
+      <p
+        className={`font-sans text-center max-w-md ${
+          variant === "card"
+            ? "text-xs sm:text-sm text-red-700/90"
+            : variant === "hero"
+              ? "text-xs text-white/75"
+              : "text-xs sm:text-sm text-white/80"
+        }`}
+      >
+        {labels.sub}
+      </p>
     </div>
   );
 }
 
 function UrgencyBar() {
+  const slots = getBonusSlotsLeft();
   return (
-    <div className="sticky top-0 z-50 bg-gradient-to-r from-accent via-accent-300 to-accent text-foreground py-2.5 px-4 text-center">
+    <div className="sticky top-0 z-50 bg-gradient-to-r from-red-800 via-red-700 to-red-800 text-white py-2.5 px-4 text-center border-b border-red-900/50">
       <p className="font-sans font-bold text-xs sm:text-sm uppercase tracking-wide flex items-center justify-center gap-2 flex-wrap">
         <Flame className="w-4 h-4 flex-shrink-0 animate-pulse" />
         <span>
-          OFERTA POR TEMPO LIMITADO · DE R${PRICE_FROM} POR{" "}
-          <span className="text-secondary">R${PRICE_TO}</span> · 50% OFF
+          Últimas {slots} vagas com bônus · De R${PRICE_FROM} por{" "}
+          <span className="text-accent font-extrabold">R${PRICE_TO}</span> — encerra
+          hoje
         </span>
         <Flame className="w-4 h-4 flex-shrink-0 animate-pulse" />
       </p>
@@ -145,51 +236,57 @@ function Hero() {
       />
 
       <div className="relative z-10 flex flex-col items-center justify-center min-h-[100vh] px-6 py-20 text-center max-w-5xl mx-auto">
-        <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-accent/15 border border-accent/40 text-accent text-xs sm:text-sm font-sans font-medium uppercase tracking-widest mb-6 animate-fade-up">
-          <Sparkles className="w-3.5 h-3.5" />
-          Edição Premium · Acesso Vitalício
+        <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-red-600/90 border border-red-400/50 text-white text-xs sm:text-sm font-sans font-bold uppercase tracking-widest mb-6 animate-fade-up">
+          <Flame className="w-3.5 h-3.5 animate-pulse" />
+          Lote promocional — só até hoje
         </span>
 
         <h1 className="font-display font-extrabold text-4xl sm:text-5xl md:text-7xl lg:text-8xl leading-[1.05] text-balance animate-fade-up">
-          DESCUBRA AS{" "}
-          <span className="text-accent">21 RECEITAS BÍBLICAS</span>{" "}
-          QUE A IGREJA ESQUECEU
+          O GUIA CULINÁRIO QUE{" "}
+          <span className="text-accent">TRANSFORMA SUA MESA</span>
+          <br className="hidden sm:block" />
+          EM UM ALTAR DE SAÚDE E FÉ
         </h1>
 
         <p className="font-serif italic text-lg md:text-2xl mt-8 max-w-3xl text-white/95 text-balance animate-fade-up leading-relaxed">
-          Os mesmos alimentos que sustentaram profetas no deserto, curaram reis
-          à beira da morte e alimentaram multidões — agora adaptados para a
-          cozinha brasileira moderna.
+          21 receitas que sustentaram profetas, curaram reis e alimentaram
+          multidões — com passo a passo simples, ingredientes do mercado
+          brasileiro e o significado espiritual de cada prato.
         </p>
 
-        <div className="mt-8 inline-flex items-center gap-3 bg-foreground/40 backdrop-blur border border-accent/30 rounded-full px-5 py-2.5">
-          <Flame className="w-5 h-5 text-accent animate-pulse" />
-          <span className="font-sans text-sm text-white/90">
-            Oferta encerra em:
-          </span>
-          <CountdownTimer />
+        <p className="font-sans text-sm md:text-base mt-4 text-white/70 max-w-2xl">
+          Mais de <strong className="text-accent">1.000 famílias</strong> já
+          sentaram à mesa. Falta você resgatar o que a igreja deixou de ensinar
+          sobre alimentação.
+        </p>
+
+        <div className="w-full max-w-md bg-foreground/50 backdrop-blur border border-red-500/40 rounded-2xl px-5 py-4">
+          <UrgencyCountdownBlock variant="hero" />
         </div>
 
         <div className="mt-8 flex flex-col items-center gap-3 animate-fade-up">
           <CTA variant="huge">
             <Gift className="w-5 h-5" />
-            QUERO RESGATAR MEU EBOOK AGORA
+            SIM — QUERO COZINHAR COMO NA MESA DOS PROFETAS
+            <ArrowRight className="w-5 h-5" />
           </CTA>
           <p className="font-sans text-sm text-white/80">
-            De{" "}
-            <span className="line-through text-white/60">R$ {PRICE_FROM}</span>{" "}
-            por apenas{" "}
-            <strong className="text-accent text-lg">R$ {PRICE_TO}</strong> · ou{" "}
-            {INSTALLMENTS_COUNT}x de R$ {PRICE_INSTALLMENTS}
+            <span className="line-through text-white/50">R$ {PRICE_FROM}</span>{" "}
+            <strong className="text-accent text-lg">R$ {PRICE_TO}</strong> hoje
+            · ou {INSTALLMENTS_COUNT}x de R$ {PRICE_INSTALLMENTS} ·{" "}
+            <strong className="text-white">+ R$ 111 em bônus grátis</strong>
+          </p>
+          <p className="font-sans text-xs text-white/55 uppercase tracking-wider">
+            Acesso imediato no e-mail · Garantia incondicional de 7 dias
           </p>
         </div>
 
         <div className="mt-10 grid grid-cols-2 sm:grid-cols-4 gap-4 max-w-2xl">
           {[
-            { icon: ShieldCheck, label: "Pagamento Seguro" },
-            { icon: Clock, label: "Acesso Imediato" },
-            { icon: Award, label: "Garantia 7 dias" },
-            { icon: Heart, label: "+1000 Leitores" },
+            { icon: ShieldCheck, label: "Checkout Seguro" },
+            { icon: Clock, label: "PDF na Hora" },
+            { icon: Award, label: "7 Dias de Garantia" },
+            { icon: Heart, label: "+1.000 Famílias" },
           ].map(({ icon: Icon, label }) => (
             <div
               key={label}
@@ -215,16 +312,16 @@ function Hero() {
 
 const DORES = [
   {
-    title: "Cansa(do) de dietas modernas que não funcionam?",
-    desc: "Você já testou keto, jejum intermitente, dieta da lua... e nada traz a paz e a saúde que sua alma também precisa.",
+    title: "Cansado de dietas que prometem e não entregam?",
+    desc: "Você troca o pão de Ezequiel pelo industrial, o azeite da unção pela margarina — e ainda se culpa. Chegou a hora de comer como quem foi criado à imagem de Deus.",
   },
   {
-    title: "Quer voltar à alimentação que Deus prescreveu?",
-    desc: "A Bíblia revela exatamente o que sustentou os escolhidos por milênios. Comida real, simples e nutritiva.",
+    title: "Quer uma mesa que nutre corpo E alma?",
+    desc: "Não é só receita: é história bíblica, ciência moderna e reflexão espiritual em cada prato. Sua família vai sentir a diferença na primeira semana.",
   },
   {
-    title: "Procura uma cozinha com propósito sagrado?",
-    desc: "Cada refeição vira oração. Cada prato, uma conexão profunda com a Palavra e com Quem te criou.",
+    title: "Sonha em cozinhar com propósito — sem complicação?",
+    desc: "Ingredientes de mercado, passo a passo claro, zero gourmetização. Se você sabe ferver água, você consegue preparar como na mesa dos profetas.",
   },
 ];
 
@@ -262,12 +359,12 @@ function ParaQuemE() {
 
         <div className="text-center mt-12">
           <p className="font-serif italic text-lg md:text-2xl text-foreground text-balance max-w-3xl mx-auto">
-            Se você se vê em <strong className="not-italic">qualquer uma</strong> dessas situações, A Mesa dos Profetas é a{" "}
-            <strong className="not-italic text-secondary">escolha perfeita</strong> para você.
+            Se você se reconheceu em <strong className="not-italic">qualquer uma</strong>, não espere mais um domingo passar com a mesa vazia de propósito.{" "}
+            <strong className="not-italic text-secondary">O guia está pronto para você.</strong>
           </p>
           <div className="mt-8">
             <CTA variant="primary">
-              SIM, EU QUERO TRANSFORMAR MINHA MESA
+              QUERO TRANSFORMAR MINHA MESA AGORA
               <ArrowRight className="w-5 h-5" />
             </CTA>
           </div>
@@ -333,11 +430,12 @@ function Galeria() {
 
         <div className="text-center mt-12">
           <p className="font-sans text-muted text-sm md:text-base mb-6">
-            ...e <strong className="text-foreground">+ 15 receitas</strong> da Galileia ao palácio de Salomão
+            ...e mais <strong className="text-foreground">15 receitas secretas</strong> que você não encontra em nenhum blog cristão
           </p>
           <CTA variant="primary">
             <Utensils className="w-5 h-5" />
-            QUERO COZINHAR COMO OS PROFETAS
+            QUERO PREPARAR ESSAS RECEITAS HOJE
+            <ArrowRight className="w-5 h-5" />
           </CTA>
         </div>
       </div>
@@ -446,7 +544,7 @@ function Conteudo() {
 
         <div className="text-center mt-10">
           <CTA variant="primary">
-            QUERO ACESSO IMEDIATO A TUDO ISSO
+            GARANTIR ACESSO VITALÍCIO POR R$ {PRICE_TO}
             <ArrowRight className="w-5 h-5" />
           </CTA>
         </div>
@@ -491,14 +589,15 @@ function Bonus() {
         <div className="text-center mb-14">
           <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-accent text-foreground text-xs sm:text-sm font-sans font-bold uppercase tracking-widest mb-6">
             <Gift className="w-4 h-4" />
-            Bônus Exclusivos · Só de presente HOJE
+            Bônus somem à meia-noite — não perca
           </span>
           <h2 className="font-display font-extrabold text-3xl md:text-5xl text-white text-balance leading-tight">
-            Comprando HOJE você leva{" "}
-            <span className="text-accent">3 bônus de presente</span>
+            Compre hoje e leve{" "}
+            <span className="text-accent">R$ 111 em presentes</span> de graça
           </h2>
           <p className="font-serif italic text-lg md:text-xl text-white/80 mt-6 max-w-2xl mx-auto">
-            Mais de <strong className="not-italic text-accent">R$ 111 em bônus</strong> totalmente gratuitos junto com o seu ebook
+            Plano de 7 dias + lista de compras + guia dos alimentos — tudo que você precisa para{" "}
+            <strong className="not-italic text-white">começar na cozinha ainda esta semana</strong>
           </p>
           <div className="gold-divider mt-6" />
         </div>
@@ -565,12 +664,12 @@ function Bonus() {
         <div className="text-center mt-12">
           <CTA variant="huge">
             <Gift className="w-5 h-5" />
-            QUERO O EBOOK + 3 BÔNUS GRÁTIS
+            RESGATAR EBOOK + 3 BÔNUS POR R$ {PRICE_TO}
+            <ArrowRight className="w-5 h-5" />
           </CTA>
           <p className="mt-4 font-sans text-sm text-white/70">
-            Valor total dos bônus:{" "}
-            <strong className="text-accent">R$ 111</strong> · Seu investimento:
-            apenas <strong className="text-accent">R$ {PRICE_TO}</strong>
+            Você economiza <strong className="text-accent">R$ 171</strong> neste
+            lote · Menos que um delivery para mudar sua mesa para sempre
           </p>
         </div>
       </div>
@@ -892,23 +991,24 @@ function PrecoOferta() {
       <div className="max-w-3xl mx-auto text-center">
         <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-red-600 text-white text-xs sm:text-sm font-sans font-bold uppercase tracking-widest mb-6 animate-pulse">
           <Flame className="w-4 h-4" />
-          OFERTA ESPECIAL · TEMPO LIMITADO
+          Última chance de hoje — preço sobe amanhã
         </span>
 
         <h2 className="font-display font-extrabold text-3xl md:text-5xl lg:text-6xl text-white leading-tight text-balance">
-          Você teria pago{" "}
+          Tudo isso custaria{" "}
           <span className="text-accent">R$ 238</span>
           <br />
-          pelo bundle completo
+          separado. Hoje sai por R$ {PRICE_TO}.
         </h2>
 
         <p className="font-serif italic text-lg md:text-xl text-white/85 mt-6 max-w-2xl mx-auto">
-          (Ebook R$ {PRICE_FROM} + Plano de 7 Dias R$ 47 + Lista de Compras R$ 27 + Guia dos Alimentos R$ 37)
+          Ebook (R$ {PRICE_FROM}) + Plano 7 dias (R$ 47) + Lista de compras (R$ 27) + Guia dos alimentos (R$ 37) —{" "}
+          <strong className="not-italic text-white">um único clique, acesso vitalício.</strong>
         </p>
 
         <div className="my-12 bg-white text-foreground rounded-3xl p-8 md:p-12 shadow-2xl border-4 border-accent">
           <p className="font-sans uppercase tracking-widest text-xs text-secondary">
-            Hoje, por apenas
+            Investimento único — pague uma vez, use para sempre
           </p>
           <p className="font-sans line-through text-2xl md:text-3xl text-muted mt-3">
             De R$ {PRICE_FROM},00
@@ -933,10 +1033,13 @@ function PrecoOferta() {
             </span>
           </div>
 
+          <UrgencyCountdownBlock variant="card" />
+
           <div className="mt-8">
             <CTA variant="huge" className="w-full">
               <Gift className="w-5 h-5" />
-              GARANTIR MEU EBOOK + BÔNUS
+              SIM — QUERO O GUIA COMPLETO POR R$ {PRICE_TO}
+              <ArrowRight className="w-5 h-5" />
             </CTA>
           </div>
 
@@ -951,7 +1054,8 @@ function PrecoOferta() {
         </div>
 
         <p className="font-sans text-white/80 text-sm md:text-base max-w-xl mx-auto">
-          Menos que o valor de um <strong className="text-accent">delivery de pizza</strong> para você transformar sua mesa em um altar de saúde e espiritualidade.
+          Enquanto você hesita, outra família já está preparando o pão de Ezequiel.{" "}
+          <strong className="text-accent">R$ {PRICE_TO}</strong> é menos que um delivery — e muda sua mesa para sempre.
         </p>
       </div>
     </section>
@@ -1109,21 +1213,22 @@ function CTAFinal() {
       <div className="relative max-w-4xl mx-auto text-center">
         <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-red-600 text-white text-xs sm:text-sm font-sans font-bold uppercase tracking-widest mb-6 animate-pulse">
           <Flame className="w-4 h-4" />
-          ÚLTIMA CHANCE · OFERTA EXPIRA EM BREVE
+          Não feche esta página sem garantir seu acesso
         </span>
 
         <h2 className="font-display font-extrabold text-3xl md:text-5xl lg:text-6xl text-balance leading-tight">
-          A mesa está posta.
+          Daqui a 6 meses, você pode estar
           <br />
-          <span className="text-accent">O banquete está servido.</span>
+          <span className="text-accent">cozinhando como os profetas</span>
+          <br />
+          — ou ainda adiando.
         </h2>
 
-        <div className="mt-6">
-          <CountdownTimer />
-        </div>
+        <UrgencyCountdownBlock variant="final" />
 
         <p className="font-serif italic text-lg md:text-2xl text-white/90 mt-8 max-w-2xl mx-auto text-balance leading-relaxed">
-          Resgate HOJE os segredos alimentares que sustentaram reis, fortaleceram profetas e nutriram o próprio Filho de Deus.
+          O guia culinário mais completo de receitas bíblicas do Brasil está a um clique.{" "}
+          <strong className="not-italic text-white">Amanhã o preço volta para R$ {PRICE_FROM} e os bônus somem.</strong>
         </p>
 
         <div className="mt-10 inline-flex flex-col items-center gap-2 px-6 py-4 bg-foreground/40 backdrop-blur border border-accent/40 rounded-2xl">
@@ -1141,14 +1246,18 @@ function CTAFinal() {
         <div className="flex flex-col items-center gap-3 mt-10">
           <CTA variant="huge">
             <Gift className="w-5 h-5" />
-            GARANTIR MEU EBOOK + 3 BÔNUS
+            GARANTIR MEU LUGAR NA MESA — R$ {PRICE_TO}
+            <ArrowRight className="w-5 h-5" />
           </CTA>
+          <p className="font-sans text-xs text-white/50 max-w-sm">
+            Ao clicar, você será levado ao checkout seguro da Hotmart. PDF no e-mail em minutos.
+          </p>
           <a
             href="mailto:contato@mesadosprofetas.com"
             className="font-sans text-sm text-white/70 hover:text-accent transition-colors inline-flex items-center gap-2"
           >
             <Mail className="w-4 h-4" />
-            Tenho dúvidas, quero falar com o suporte
+            Ainda em dúvida? Fale com o suporte antes que o lote feche
           </a>
         </div>
 
