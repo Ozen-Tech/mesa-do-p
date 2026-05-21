@@ -32,7 +32,7 @@ export default {
         },
         foreground: "#3D2817",
         background: "#F5E6D3",
-        muted: "#8A7060",
+        muted: "#5C4A3D",
       },
       fontFamily: {
         display: ['"Playfair Display"', "Georgia", "serif"],

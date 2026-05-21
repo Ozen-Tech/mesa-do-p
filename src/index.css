@@ -18,6 +18,8 @@ html {
 
 body {
   font-family: "Inter", system-ui, sans-serif;
+  font-size: 1.125rem;
+  line-height: 1.65;
   background-color: var(--color-background);
   color: var(--color-foreground);
 }
