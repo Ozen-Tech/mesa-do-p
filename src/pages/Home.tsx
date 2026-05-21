@@ -5,53 +5,148 @@ import {
   Utensils,
   Star,
   ChevronDown,
+  ChevronUp,
   Plus,
   Check,
   X,
   Mail,
   ShieldCheck,
   Clock,
-  Flame,
   Gift,
   CreditCard,
   Award,
   ArrowRight,
   Heart,
+  MessageCircle,
+  MousePointerClick,
+  FileText,
+  Menu,
 } from "lucide-react";
 
 const HOTMART_URL =
   "https://pay.hotmart.com/G105661402K?checkoutMode=10";
+const SUPPORT_EMAIL = "contato@mesadosprofetas.com";
+const WHATSAPP_NUMBER = "5598999068855";
+const WHATSAPP_URL = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(
+  "Olá! Tenho uma dúvida sobre o ebook A Mesa dos Profetas."
+)}`;
 
 const PRICE_FROM = "127";
 const PRICE_TO = "67";
 const PRICE_INSTALLMENTS = "6,46";
 const INSTALLMENTS_COUNT = "12";
 
+const NAV_LINKS = [
+  { href: "#inicio", label: "Início" },
+  { href: "#conteudo", label: "O que inclui" },
+  { href: "#depoimentos", label: "Depoimentos" },
+  { href: "#preco", label: "Preço" },
+  { href: "#duvidas", label: "Dúvidas" },
+  { href: HOTMART_URL, label: "Comprar", external: true },
+] as const;
+
 const ctaClasses =
-  "inline-flex items-center justify-center gap-2 px-6 sm:px-10 py-4 sm:py-5 rounded-full font-sans font-bold tracking-wide transition-all duration-300 ease-out cursor-pointer uppercase text-sm sm:text-base";
+  "inline-flex items-center justify-center gap-2 px-6 sm:px-10 py-4 sm:py-5 min-h-[48px] rounded-full font-sans font-bold tracking-normal transition-all duration-300 ease-out cursor-pointer text-base sm:text-lg hover:-translate-y-0.5";
+
+function useReducedMotion() {
+  const [reduced, setReduced] = useState(false);
+  useEffect(() => {
+    const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
+    setReduced(mq.matches);
+    const onChange = () => setReduced(mq.matches);
+    mq.addEventListener("change", onChange);
+    return () => mq.removeEventListener("change", onChange);
+  }, []);
+  return reduced;
+}
+
+function CompraSeguraBadge({
+  className = "",
+  light = false,
+}: {
+  className?: string;
+  light?: boolean;
+}) {
+  return (
+    <div
+      className={`flex flex-col items-center gap-2 text-center max-w-md mx-auto ${className}`}
+    >
+      <p
+        className={`font-sans text-sm sm:text-base leading-relaxed ${
+          light ? "text-white/90" : "text-foreground/85"
+        }`}
+      >
+        <ShieldCheck className="w-4 h-4 inline-block text-accent mr-1 -mt-0.5" />
+        Pagamento na <strong>Hotmart</strong> — plataforma usada por milhares de
+        cursos no Brasil
+      </p>
+      <div
+        className={`flex flex-wrap items-center justify-center gap-3 text-sm font-sans ${
+          light ? "text-white/80" : "text-foreground/75"
+        }`}
+      >
+        <span className="inline-flex items-center gap-1">
+          <CreditCard className="w-4 h-4 text-accent" /> Cartão
+        </span>
+        <span>Pix</span>
+        <span>Boleto</span>
+      </div>
+    </div>
+  );
+}
+
+function GarantiaAbaixoCTA({ light = false }: { light?: boolean }) {
+  return (
+    <p
+      className={`font-sans text-sm sm:text-base flex items-center justify-center gap-2 flex-wrap text-center ${
+        light ? "text-white/90" : "text-foreground/80"
+      }`}
+    >
+      <ShieldCheck className="w-5 h-5 text-accent flex-shrink-0" />
+      <span>
+        <strong>7 dias</strong> para experimentar — devolução total, sem
+        perguntas
+      </span>
+    </p>
+  );
+}
 
 type CtaProps = {
   variant?: "primary" | "secondary" | "huge";
   children: React.ReactNode;
   className?: string;
+  showTrust?: boolean;
 };
 
-function CTA({ variant = "primary", children, className = "" }: CtaProps) {
+function CTA({
+  variant = "primary",
+  children,
+  className = "",
+  showTrust = false,
+}: CtaProps) {
+  const reducedMotion = useReducedMotion();
   const variants: Record<NonNullable<CtaProps["variant"]>, string> = {
     primary:
-      "bg-accent text-foreground hover:bg-accent-300 shadow-gold hover:shadow-2xl hover:-translate-y-0.5",
+      "bg-accent text-foreground hover:bg-accent-300 shadow-gold hover:shadow-2xl",
     secondary:
-      "bg-foreground text-accent hover:bg-secondary hover:text-white shadow-xl hover:-translate-y-0.5",
-    huge: "bg-gradient-to-r from-accent via-accent-300 to-accent text-foreground hover:scale-105 shadow-2xl text-base sm:text-xl px-8 sm:px-14 py-5 sm:py-6 animate-pulse-slow",
+      "bg-foreground text-accent hover:bg-secondary hover:text-white shadow-xl",
+    huge: `bg-gradient-to-r from-accent via-accent-300 to-accent text-foreground shadow-2xl text-lg sm:text-xl px-8 sm:px-14 py-5 sm:py-6 ${
+      reducedMotion ? "" : "hover:scale-[1.02]"
+    }`,
   };
 
   return (
-    <a
-      href={HOTMART_URL}
-      className={`${ctaClasses} ${variants[variant]} ${className}`}
-    >
-      {children}
-    </a>
+    <div className={`flex flex-col items-center gap-3 w-full ${className}`}>
+      <a href={HOTMART_URL} className={`${ctaClasses} ${variants[variant]} w-full sm:w-auto`}>
+        {children}
+      </a>
+      {showTrust && (
+        <>
+          <GarantiaAbaixoCTA light={variant === "huge"} />
+          <CompraSeguraBadge light={variant === "huge"} />
+        </>
+      )}
+    </div>
   );
 }
 
@@ -90,7 +185,7 @@ function CountdownTimer({
 
   const pad = (n: number) => String(n).padStart(2, "0");
   const box = light
-    ? `bg-red-700 text-white rounded-md text-center font-mono font-bold tabular-nums ${
+    ? `bg-foreground text-accent rounded-md text-center font-mono font-bold tabular-nums ${
         compact
           ? "text-base px-2 py-1 min-w-[2.25rem]"
           : "text-lg sm:text-2xl px-2.5 sm:px-3.5 py-1 sm:py-1.5 min-w-[2.75rem]"
@@ -101,7 +196,7 @@ function CountdownTimer({
           : "text-lg sm:text-2xl px-2.5 sm:px-3.5 py-1 sm:py-1.5 min-w-[2.75rem] sm:min-w-[3.25rem]"
       }`;
   const sep = light
-    ? "text-red-800 text-sm"
+    ? "text-foreground/70 text-sm"
     : compact
       ? "text-white/70 text-sm"
       : "text-foreground";
@@ -130,42 +225,42 @@ function UrgencyCountdownBlock({
   const labels =
     variant === "final"
       ? {
-          title: "Esta condição some à meia-noite",
-          sub: `Restam ${slots} acessos com os 3 bônus inclusos hoje`,
+          title: "Condição especial válida até a meia-noite de hoje",
+          sub: `Ainda há ${slots} acessos com os 3 presentes neste lote`,
         }
       : variant === "card"
         ? {
-            title: "Preço promocional encerra hoje",
-            sub: "Depois volta para R$ 127 sem os bônus",
+            title: "Valor promocional válido só hoje",
+            sub: `Amanhã o ebook volta a R$ ${PRICE_FROM} sem os bônus`,
           }
         : {
-            title: "Bônus de R$ 111 somem à meia-noite",
-            sub: `Só ${slots} acessos com desconto + 3 presentes hoje`,
+            title: "Presentes de R$ 111 inclusos até a meia-noite",
+            sub: `Restam ${slots} acessos com desconto neste lote de hoje`,
           };
 
   return (
     <div
       className={
         variant === "card"
-          ? "mt-6 p-4 rounded-2xl bg-red-50 border-2 border-red-200"
+          ? "mt-6 p-4 rounded-2xl bg-accent/10 border-2 border-accent/40"
           : variant === "final"
             ? "mt-6 inline-flex flex-col items-center gap-3"
             : "flex flex-col items-center gap-3"
       }
     >
       <div className="flex items-center gap-2 flex-wrap justify-center">
-        <Flame
-          className={`w-5 h-5 animate-pulse flex-shrink-0 ${
-            variant === "card" ? "text-red-600" : "text-red-400"
+        <Clock
+          className={`w-5 h-5 flex-shrink-0 ${
+            variant === "card" ? "text-secondary" : "text-accent"
           }`}
         />
         <span
-          className={`font-sans font-bold uppercase tracking-wide text-center ${
+          className={`font-sans font-semibold text-center ${
             variant === "card"
-              ? "text-xs sm:text-sm text-red-800"
+              ? "text-sm sm:text-base text-foreground"
               : variant === "hero"
-                ? "text-sm text-white"
-                : "text-xs sm:text-sm text-white/95"
+                ? "text-sm sm:text-base text-white"
+                : "text-sm sm:text-base text-white/95"
           }`}
         >
           {labels.title}
@@ -178,10 +273,10 @@ function UrgencyCountdownBlock({
       <p
         className={`font-sans text-center max-w-md ${
           variant === "card"
-            ? "text-xs sm:text-sm text-red-700/90"
+            ? "text-sm sm:text-base text-foreground/80"
             : variant === "hero"
-              ? "text-xs text-white/75"
-              : "text-xs sm:text-sm text-white/80"
+              ? "text-sm text-white/80"
+              : "text-sm sm:text-base text-white/85"
         }`}
       >
         {labels.sub}
@@ -193,36 +288,237 @@ function UrgencyCountdownBlock({
 function UrgencyBar() {
   const slots = getBonusSlotsLeft();
   return (
-    <div className="sticky top-0 z-50 bg-gradient-to-r from-red-800 via-red-700 to-red-800 text-white py-2.5 px-4 text-center border-b border-red-900/50">
-      <p className="font-sans font-bold text-xs sm:text-sm uppercase tracking-wide flex items-center justify-center gap-2 flex-wrap">
-        <Flame className="w-4 h-4 flex-shrink-0 animate-pulse" />
+    <div
+      id="topo-barra"
+      className="sticky top-0 z-[60] bg-gradient-to-r from-foreground via-secondary to-foreground text-white py-3 px-4 text-center border-b border-accent/30"
+    >
+      <p className="font-sans font-semibold text-sm sm:text-base flex items-center justify-center gap-2 flex-wrap leading-snug">
+        <Gift className="w-4 h-4 flex-shrink-0 text-accent" />
         <span>
-          Últimas {slots} vagas com bônus · De R${PRICE_FROM} por{" "}
-          <span className="text-accent font-extrabold">R${PRICE_TO}</span> — encerra
-          hoje
+          Hoje: de R${PRICE_FROM} por{" "}
+          <strong className="text-accent">R${PRICE_TO}</strong> com 3 presentes —{" "}
+          {slots} acessos neste lote
         </span>
-        <Flame className="w-4 h-4 flex-shrink-0 animate-pulse" />
       </p>
     </div>
   );
 }
 
-function Hero() {
-  const [scrollY, setScrollY] = useState(0);
+function SiteNav() {
+  const [open, setOpen] = useState(false);
+
+  return (
+    <nav
+      aria-label="Navegação principal"
+      className="sticky top-[52px] z-50 bg-background/95 backdrop-blur border-b border-foreground/10 shadow-sm"
+    >
+      <div className="max-w-6xl mx-auto px-4 flex items-center justify-between gap-4 py-2">
+        <a
+          href="#inicio"
+          className="font-display font-bold text-foreground text-sm sm:text-base hidden sm:block"
+        >
+          A Mesa dos Profetas
+        </a>
+        <ul className="hidden md:flex flex-wrap items-center justify-center gap-1 flex-1">
+          {NAV_LINKS.map((link) => (
+            <li key={link.href}>
+              <a
+                href={link.href}
+                {...("external" in link && link.external
+                  ? { target: "_blank", rel: "noopener noreferrer" }
+                  : {})}
+                className="font-sans text-sm font-medium text-foreground/90 hover:text-secondary px-3 py-2 rounded-lg hover:bg-accent/10 transition-colors"
+              >
+                {link.label}
+              </a>
+            </li>
+          ))}
+        </ul>
+        <button
+          type="button"
+          className="md:hidden p-2 rounded-lg text-foreground min-h-[48px] min-w-[48px] flex items-center justify-center"
+          aria-expanded={open}
+          aria-controls="nav-mobile"
+          onClick={() => setOpen((v) => !v)}
+        >
+          <Menu className="w-6 h-6" />
+          <span className="sr-only">Abrir menu</span>
+        </button>
+        <a
+          href={HOTMART_URL}
+          className="hidden sm:inline-flex items-center justify-center min-h-[48px] px-5 py-2 rounded-full bg-accent text-foreground font-sans font-bold text-sm hover:bg-accent-300 transition-colors"
+        >
+          Comprar
+        </a>
+      </div>
+      {open && (
+        <ul
+          id="nav-mobile"
+          className="md:hidden border-t border-foreground/10 px-4 py-3 space-y-1"
+        >
+          {NAV_LINKS.map((link) => (
+            <li key={link.href}>
+              <a
+                href={link.href}
+                onClick={() => setOpen(false)}
+                {...("external" in link && link.external
+                  ? { target: "_blank", rel: "noopener noreferrer" }
+                  : {})}
+                className="block font-sans text-base py-3 px-2 text-foreground hover:bg-accent/10 rounded-lg"
+              >
+                {link.label}
+              </a>
+            </li>
+          ))}
+        </ul>
+      )}
+    </nav>
+  );
+}
+
+const COMO_FUNCIONA = [
+  {
+    icon: MousePointerClick,
+    titulo: "1. Clique no botão dourado",
+    desc: "Você será levado à página de pagamento segura da Hotmart (abre em nova aba).",
+  },
+  {
+    icon: CreditCard,
+    titulo: "2. Escolha como pagar",
+    desc: "Cartão de crédito (até 12x), Pix ou boleto — como preferir.",
+  },
+  {
+    icon: FileText,
+    titulo: "3. Receba o PDF no e-mail",
+    desc: "Em poucos minutos o link chega na sua caixa de entrada (confira também o spam). Pode ler no celular ou imprimir.",
+  },
+];
+
+function ComoFunciona() {
+  return (
+    <section
+      id="como-funciona"
+      className="py-16 md:py-24 px-6 bg-white border-y border-foreground/5"
+    >
+      <div className="max-w-5xl mx-auto">
+        <div className="text-center mb-12">
+          <p className="font-sans text-sm font-semibold text-secondary mb-3 tracking-wide">
+            Simples e seguro
+          </p>
+          <h2 className="font-display font-bold text-3xl md:text-4xl text-foreground text-balance leading-tight">
+            Como receber o ebook em{" "}
+            <span className="text-secondary">3 passos</span>
+          </h2>
+          <div className="gold-divider mt-6" />
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          {COMO_FUNCIONA.map(({ icon: Icon, titulo, desc }) => (
+            <div
+              key={titulo}
+              className="text-center bg-background/60 rounded-2xl p-8 border border-accent/20"
+            >
+              <div className="w-16 h-16 rounded-full bg-accent/20 flex items-center justify-center mx-auto mb-5">
+                <Icon className="w-8 h-8 text-secondary" strokeWidth={1.75} />
+              </div>
+              <h3 className="font-display font-bold text-xl text-foreground mb-3">
+                {titulo}
+              </h3>
+              <p className="font-sans text-base text-foreground/85 leading-relaxed">
+                {desc}
+              </p>
+            </div>
+          ))}
+        </div>
+        <div className="mt-10">
+          <CTA variant="primary" showTrust>
+            Quero o guia completo — pagamento seguro
+            <ArrowRight className="w-5 h-5" />
+          </CTA>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function FloatingActions() {
+  const [showBuy, setShowBuy] = useState(false);
+  const [showTop, setShowTop] = useState(false);
+  const reducedMotion = useReducedMotion();
 
   useEffect(() => {
-    const onScroll = () => setScrollY(window.scrollY);
+    const onScroll = () => {
+      const y = window.scrollY;
+      const max = document.documentElement.scrollHeight - window.innerHeight;
+      setShowBuy(y > window.innerHeight * 0.3);
+      setShowTop(y > 600 && max - y > 400);
+    };
+    onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
   return (
-    <section className="relative min-h-[100vh] w-full overflow-hidden text-white">
+    <>
+      <a
+        href={WHATSAPP_URL}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="fixed bottom-24 right-4 sm:right-6 z-50 flex items-center gap-2 bg-[#25D366] text-white font-sans font-bold text-base px-4 py-3 min-h-[48px] rounded-full shadow-2xl hover:brightness-110 transition-all"
+        aria-label="Falar no WhatsApp"
+      >
+        <MessageCircle className="w-6 h-6" />
+        <span className="hidden sm:inline">Dúvidas?</span>
+      </a>
+      {showBuy && (
+        <a
+          href={HOTMART_URL}
+          className="fixed bottom-4 left-4 right-4 sm:left-auto sm:right-6 sm:max-w-sm z-50 flex items-center justify-center gap-2 min-h-[52px] px-6 py-3 rounded-full bg-accent text-foreground font-sans font-bold text-base sm:text-lg shadow-2xl hover:bg-accent-300 transition-colors text-center"
+        >
+          Comprar agora — R$ {PRICE_TO}
+        </a>
+      )}
+      {showTop && (
+        <button
+          type="button"
+          onClick={() =>
+            window.scrollTo({
+              top: 0,
+              behavior: reducedMotion ? "auto" : "smooth",
+            })
+          }
+          className="fixed bottom-24 left-4 sm:left-6 z-50 w-12 h-12 min-h-[48px] min-w-[48px] rounded-full bg-foreground text-accent shadow-xl flex items-center justify-center hover:bg-secondary transition-colors"
+          aria-label="Voltar ao topo"
+        >
+          <ChevronUp className="w-6 h-6" />
+        </button>
+      )}
+    </>
+  );
+}
+
+function Hero() {
+  const [scrollY, setScrollY] = useState(0);
+  const reducedMotion = useReducedMotion();
+
+  useEffect(() => {
+    if (reducedMotion) return;
+    const onScroll = () => setScrollY(window.scrollY);
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, [reducedMotion]);
+
+  const parallaxY = reducedMotion ? 0 : scrollY * 0.35;
+
+  return (
+    <section
+      id="inicio"
+      className="relative min-h-[100vh] w-full overflow-hidden text-white"
+    >
       <div
         className="absolute inset-0 bg-cover bg-center will-change-transform"
         style={{
           backgroundImage: 'url("/images/hero-mesa.jpg")',
-          transform: `translateY(${scrollY * 0.35}px) scale(1.1)`,
+          transform: `translateY(${parallaxY}px) scale(1.1)`,
         }}
         aria-hidden="true"
       />
@@ -236,48 +532,40 @@ function Hero() {
       />
 
       <div className="relative z-10 flex flex-col items-center justify-center min-h-[100vh] px-6 py-20 text-center max-w-5xl mx-auto">
-        <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-red-600/90 border border-red-400/50 text-white text-xs sm:text-sm font-sans font-bold uppercase tracking-widest mb-6 animate-fade-up">
-          <Flame className="w-3.5 h-3.5 animate-pulse" />
-          Lote promocional — só até hoje
+        <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-accent/20 border border-accent/50 text-accent text-sm sm:text-base font-sans font-semibold mb-6">
+          <BookOpen className="w-4 h-4" />
+          21 receitas bíblicas · passo a passo · acesso vitalício
         </span>
 
-        <h1 className="font-display font-extrabold text-4xl sm:text-5xl md:text-7xl lg:text-8xl leading-[1.05] text-balance animate-fade-up">
-          O GUIA CULINÁRIO QUE{" "}
-          <span className="text-accent">TRANSFORMA SUA MESA</span>
-          <br className="hidden sm:block" />
-          EM UM ALTAR DE SAÚDE E FÉ
+        <h1 className="font-display font-extrabold text-3xl sm:text-4xl md:text-5xl lg:text-6xl leading-[1.15] text-balance">
+          21 receitas bíblicas para sua cozinha — com oração e significado em
+          cada prato
         </h1>
 
-        <p className="font-serif italic text-lg md:text-2xl mt-8 max-w-3xl text-white/95 text-balance animate-fade-up leading-relaxed">
-          21 receitas que sustentaram profetas, curaram reis e alimentaram
-          multidões — com passo a passo simples, ingredientes do mercado
-          brasileiro e o significado espiritual de cada prato.
+        <p className="font-sans text-lg md:text-xl mt-8 max-w-3xl text-white/95 text-balance leading-relaxed">
+          Ingredientes do mercado da esquina, modo de preparo claro e reflexão
+          espiritual. Pode ler no celular, aumentar a letra ou imprimir o PDF.
         </p>
 
-        <p className="font-sans text-sm md:text-base mt-4 text-white/70 max-w-2xl">
+        <p className="font-sans text-base md:text-lg mt-4 text-white/85 max-w-2xl">
           Mais de <strong className="text-accent">1.000 famílias</strong> já
-          sentaram à mesa. Falta você resgatar o que a igreja deixou de ensinar
-          sobre alimentação.
+          usam o guia em estudos de família e células.
         </p>
 
-        <div className="w-full max-w-md bg-foreground/50 backdrop-blur border border-red-500/40 rounded-2xl px-5 py-4">
+        <div className="w-full max-w-md bg-foreground/50 backdrop-blur border border-accent/40 rounded-2xl px-5 py-4 mt-6">
           <UrgencyCountdownBlock variant="hero" />
         </div>
 
-        <div className="mt-8 flex flex-col items-center gap-3 animate-fade-up">
-          <CTA variant="huge">
+        <div className="mt-8 w-full max-w-lg">
+          <CTA variant="huge" showTrust>
             <Gift className="w-5 h-5" />
-            SIM — QUERO COZINHAR COMO NA MESA DOS PROFETAS
+            Quero o guia completo — pagamento seguro
             <ArrowRight className="w-5 h-5" />
           </CTA>
-          <p className="font-sans text-sm text-white/80">
+          <p className="font-sans text-base text-white/85 mt-4 text-center">
             <span className="line-through text-white/50">R$ {PRICE_FROM}</span>{" "}
-            <strong className="text-accent text-lg">R$ {PRICE_TO}</strong> hoje
-            · ou {INSTALLMENTS_COUNT}x de R$ {PRICE_INSTALLMENTS} ·{" "}
-            <strong className="text-white">+ R$ 111 em bônus grátis</strong>
-          </p>
-          <p className="font-sans text-xs text-white/55 uppercase tracking-wider">
-            Acesso imediato no e-mail · Garantia incondicional de 7 dias
+            <strong className="text-accent text-xl">R$ {PRICE_TO}</strong> hoje
+            · ou {INSTALLMENTS_COUNT}x de R$ {PRICE_INSTALLMENTS}
           </p>
         </div>
 
@@ -512,7 +800,7 @@ const CONTEUDO = [
 
 function Conteudo() {
   return (
-    <section className="py-20 md:py-28 px-6 bg-white">
+    <section id="conteudo" className="py-20 md:py-28 px-6 bg-white">
       <div className="max-w-5xl mx-auto">
         <div className="text-center mb-14">
           <p className="font-sans uppercase tracking-[0.3em] text-xs md:text-sm text-secondary mb-4">
@@ -542,9 +830,13 @@ function Conteudo() {
           </ul>
         </div>
 
+        <p className="font-sans text-base text-muted text-center mt-8 max-w-2xl mx-auto">
+          Pode imprimir o PDF ou ler no celular — aumente o tamanho da letra no
+          aplicativo de leitura.
+        </p>
         <div className="text-center mt-10">
-          <CTA variant="primary">
-            GARANTIR ACESSO VITALÍCIO POR R$ {PRICE_TO}
+          <CTA variant="primary" showTrust>
+            Garantir acesso vitalício por R$ {PRICE_TO}
             <ArrowRight className="w-5 h-5" />
           </CTA>
         </div>
@@ -556,7 +848,7 @@ function Conteudo() {
 const BONUS = [
   {
     titulo: "BÔNUS #1: Plano Alimentar de 7 Dias",
-    subtitulo: "A Jornada do Profeta",
+    subtitulo: "Cardápio da semana — café, almoço e jantar prontos",
     desc: "Um cardápio completo dia-a-dia para você experimentar a alimentação bíblica por uma semana inteira. Café, almoço e jantar prontos.",
     valor: "R$ 47",
   },
@@ -662,9 +954,9 @@ function Bonus() {
         </div>
 
         <div className="text-center mt-12">
-          <CTA variant="huge">
+          <CTA variant="huge" showTrust>
             <Gift className="w-5 h-5" />
-            RESGATAR EBOOK + 3 BÔNUS POR R$ {PRICE_TO}
+            Resgatar ebook + 3 presentes por R$ {PRICE_TO}
             <ArrowRight className="w-5 h-5" />
           </CTA>
           <p className="mt-4 font-sans text-sm text-white/70">
@@ -738,7 +1030,7 @@ function SobreAutor() {
     <section className="py-20 md:py-28 px-6 bg-background">
       <div className="max-w-6xl mx-auto">
         <div className="text-center mb-12">
-          <p className="font-sans uppercase tracking-[0.3em] text-xs md:text-sm text-secondary mb-4">
+          <p className="font-sans text-sm font-semibold text-secondary mb-4 tracking-wide">
             Quem está por trás
           </p>
           <h2 className="font-display font-bold text-3xl md:text-5xl text-foreground text-balance leading-tight">
@@ -753,12 +1045,11 @@ function SobreAutor() {
             <div className="relative aspect-[3/4] rounded-3xl overflow-hidden bg-gradient-to-br from-foreground via-secondary to-accent flex items-center justify-center shadow-2xl">
               <div className="text-center text-white p-8">
                 <p className="font-display font-extrabold text-7xl">EAV</p>
-                <p className="font-serif italic text-lg mt-4 text-white/90">
-                  Autor, Pesquisador e Curador
+                <p className="font-sans text-lg mt-4 text-white/90">
+                  Enzo Almeida Verde
                 </p>
-                <div className="gold-divider mt-4 !w-24" />
-                <p className="font-sans text-sm mt-4 text-white/80 uppercase tracking-widest">
-                  ✦ Nutrição Bíblica ✦
+                <p className="font-sans text-sm mt-4 text-white/80">
+                  Autor, pesquisador e curador
                 </p>
               </div>
             </div>
@@ -805,89 +1096,151 @@ function SobreAutor() {
   );
 }
 
+const TESTEMUNHO_DESTAQUE = {
+  nome: "Pr. João Almeida",
+  idade: "62 anos",
+  cidade: "Belo Horizonte, MG",
+  contexto: "Pastor — estudos de família",
+  texto:
+    "Uso este material nos cultos de família. Cozinhar a Sopa de Lentilhas de Esaú enquanto leio Gênesis virou um momento sagrado em casa. Recomendo a todos os pastores e líderes!",
+};
+
 const TESTEMUNHOS = [
   {
     nome: "Maria Soares",
+    idade: "68 anos",
     cidade: "São Paulo, SP",
-    texto: "Substituí o pão branco pelo Pão de Ezequiel e em duas semanas senti a diferença. Mais energia, menos fome no meio da manhã. Mas o que mais me tocou foi a reflexão espiritual antes de cada receita. Vale cada centavo!",
-  },
-  {
-    nome: "Pr. João Almeida",
-    cidade: "Belo Horizonte, MG",
-    texto: "Uso este material nos cultos de família. Cozinhar a Sopa de Lentilhas de Esaú enquanto leio Gênesis virou um momento sagrado em casa. Recomendo a todos os pastores e líderes!",
+    contexto: "Membro de célula",
+    texto:
+      "Substituí o pão branco pelo Pão de Ezequiel e em duas semanas senti a diferença. Mais energia e a reflexão espiritual antes de cada receita me emocionou.",
   },
   {
     nome: "Ana Carvalho",
+    idade: "54 anos",
     cidade: "Curitiba, PR",
-    texto: "Não esperava que receitas trouxessem tanta paz. A bebida de mel e ervas do João Batista tornou-se meu ritual da noite. Meu marido perdeu 4kg em 1 mês só seguindo o plano de 7 dias!",
+    contexto: "Dona de casa",
+    texto:
+      "A bebida de mel e ervas do João Batista tornou-se meu ritual da noite. O plano de 7 dias é fácil de seguir — café, almoço e jantar já vêm prontos.",
   },
   {
     nome: "Roberto Mendes",
+    idade: "71 anos",
     cidade: "Salvador, BA",
-    texto: "Sou diabético e meu médico me proibiu de quase tudo. Quando descobri o pão de cevada deste ebook, minha vida mudou. Glicemia controlada e sabor de verdade na mesa.",
+    contexto: "Diabético — com orientação médica",
+    texto:
+      "Quando descobri o pão de cevada deste ebook, minha mesa ganhou sabor de verdade. Consultei meu médico e ele aprovou incluir as receitas na minha rotina.",
   },
   {
     nome: "Cláudia Ferraz",
+    idade: "59 anos",
     cidade: "Recife, PE",
-    texto: "Comprei pensando que era só mais um ebook. Estava enganada! Cada página é uma aula de fé e nutrição. Já presenteei 3 amigas. Conteúdo simplesmente IMPECÁVEL.",
+    contexto: "Estudo bíblico em casa",
+    texto:
+      "Cada página é uma aula de fé e nutrição. Já presenteei 3 amigas da igreja. Conteúdo claro e respeitoso.",
   },
   {
     nome: "Pra. Helena Vieira",
+    idade: "65 anos",
     cidade: "Brasília, DF",
-    texto: "As reflexões espirituais são profundas e a comida é deliciosa. Usei na escola dominical e mudou a forma como nossa igreja enxerga as Escrituras. Bíblia e mesa juntas, finalmente!",
+    contexto: "Escola dominical",
+    texto:
+      "Usei na escola dominical e mudou a forma como nossa igreja enxerga as Escrituras. Bíblia e mesa juntas, finalmente!",
   },
 ];
 
+function DepoimentoCard({
+  nome,
+  idade,
+  cidade,
+  contexto,
+  texto,
+  destaque = false,
+}: {
+  nome: string;
+  idade: string;
+  cidade: string;
+  contexto: string;
+  texto: string;
+  destaque?: boolean;
+}) {
+  return (
+    <article
+      className={`rounded-2xl p-6 md:p-8 shadow-sm flex flex-col ${
+        destaque
+          ? "bg-gradient-to-br from-foreground to-secondary text-white border-2 border-accent md:col-span-2"
+          : "bg-background/70 hover:shadow-xl transition-shadow duration-300"
+      }`}
+    >
+      <div className="flex gap-1 mb-4" aria-label="5 estrelas de avaliação">
+        {Array.from({ length: 5 }).map((_, i) => (
+          <Star
+            key={i}
+            className="w-5 h-5"
+            fill="#D4AF37"
+            stroke="#D4AF37"
+          />
+        ))}
+      </div>
+      <p
+        className={`font-sans leading-relaxed flex-1 text-base md:text-lg ${
+          destaque ? "text-white/95" : "text-foreground/90"
+        }`}
+      >
+        &ldquo;{texto}&rdquo;
+      </p>
+      <footer
+        className={`mt-5 pt-5 border-t ${
+          destaque ? "border-white/20" : "border-foreground/10"
+        }`}
+      >
+        <p
+          className={`font-display font-bold text-lg ${
+            destaque ? "text-accent" : "text-foreground"
+          }`}
+        >
+          {nome}, {idade}
+        </p>
+        <p
+          className={`font-sans text-sm mt-1 ${
+            destaque ? "text-white/80" : "text-muted"
+          }`}
+        >
+          {contexto} · {cidade}
+        </p>
+      </footer>
+    </article>
+  );
+}
+
 function Testemunhos() {
   return (
-    <section className="py-20 md:py-28 px-6 bg-white">
+    <section id="depoimentos" className="py-20 md:py-28 px-6 bg-white">
       <div className="max-w-7xl mx-auto">
         <div className="text-center mb-14">
-          <p className="font-sans uppercase tracking-[0.3em] text-xs md:text-sm text-secondary mb-4">
-            ✦ Veja o que dizem os leitores ✦
+          <p className="font-sans text-sm font-semibold text-secondary mb-4 tracking-wide">
+            Indicado em estudos de família e células
           </p>
           <h2 className="font-display font-bold text-3xl md:text-5xl text-foreground text-balance leading-tight">
-            Mais de{" "}
-            <span className="text-secondary">+1.000 vidas transformadas</span>
-            <br />
-            à mesa sagrada
+            O que dizem leitores de{" "}
+            <span className="text-secondary">45 a 75 anos</span>
           </h2>
           <div className="gold-divider mt-6" />
         </div>
 
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+          <DepoimentoCard {...TESTEMUNHO_DESTAQUE} destaque />
+        </div>
+
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {TESTEMUNHOS.map((t) => (
-            <article
-              key={t.nome}
-              className="bg-background/70 rounded-2xl p-6 shadow-sm hover:shadow-2xl transition-shadow duration-300 flex flex-col"
-            >
-              <div
-                className="flex gap-1 mb-4"
-                aria-label="5 estrelas de avaliação"
-              >
-                {Array.from({ length: 5 }).map((_, i) => (
-                  <Star
-                    key={i}
-                    className="w-5 h-5"
-                    fill="#D4AF37"
-                    stroke="#D4AF37"
-                  />
-                ))}
-              </div>
-              <p className="font-serif italic text-foreground/85 leading-relaxed flex-1 text-sm md:text-base">
-                "{t.texto}"
-              </p>
-              <footer className="mt-5 pt-5 border-t border-foreground/10">
-                <p className="font-display font-bold text-base text-foreground">
-                  {t.nome}
-                </p>
-                <p className="font-sans text-xs text-muted mt-0.5">
-                  {t.cidade}
-                </p>
-              </footer>
-            </article>
+            <DepoimentoCard key={t.nome} {...t} />
           ))}
         </div>
+
+        <p className="font-sans text-sm text-muted text-center mt-10 max-w-2xl mx-auto leading-relaxed">
+          Se você tem condição de saúde (como diabetes), consulte seu médico
+          antes de mudar a alimentação.
+        </p>
       </div>
     </section>
   );
@@ -982,6 +1335,7 @@ function AntesDepois() {
 function PrecoOferta() {
   return (
     <section
+      id="preco"
       className="py-20 md:py-28 px-6 text-white relative overflow-hidden"
       style={{
         background:
@@ -989,26 +1343,26 @@ function PrecoOferta() {
       }}
     >
       <div className="max-w-3xl mx-auto text-center">
-        <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-red-600 text-white text-xs sm:text-sm font-sans font-bold uppercase tracking-widest mb-6 animate-pulse">
-          <Flame className="w-4 h-4" />
-          Última chance de hoje — preço sobe amanhã
+        <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-accent/25 border border-accent/50 text-accent text-sm sm:text-base font-sans font-semibold mb-6">
+          <Gift className="w-4 h-4" />
+          Pacote completo com valor especial de hoje
         </span>
 
         <h2 className="font-display font-extrabold text-3xl md:text-5xl lg:text-6xl text-white leading-tight text-balance">
-          Tudo isso custaria{" "}
+          O pacote completo custaria{" "}
           <span className="text-accent">R$ 238</span>
           <br />
-          separado. Hoje sai por R$ {PRICE_TO}.
+          separado. Hoje: R$ {PRICE_TO}.
         </h2>
 
-        <p className="font-serif italic text-lg md:text-xl text-white/85 mt-6 max-w-2xl mx-auto">
-          Ebook (R$ {PRICE_FROM}) + Plano 7 dias (R$ 47) + Lista de compras (R$ 27) + Guia dos alimentos (R$ 37) —{" "}
-          <strong className="not-italic text-white">um único clique, acesso vitalício.</strong>
+        <p className="font-sans text-lg md:text-xl text-white/90 mt-6 max-w-2xl mx-auto leading-relaxed">
+          Ebook (R$ {PRICE_FROM}) + plano de 7 dias (R$ 47) + lista de compras (R$ 27) + guia dos alimentos (R$ 37) —{" "}
+          <strong>um único pagamento, acesso para sempre.</strong>
         </p>
 
         <div className="my-12 bg-white text-foreground rounded-3xl p-8 md:p-12 shadow-2xl border-4 border-accent">
-          <p className="font-sans uppercase tracking-widest text-xs text-secondary">
-            Investimento único — pague uma vez, use para sempre
+          <p className="font-sans text-base font-medium text-secondary">
+            Pague uma vez e use para sempre
           </p>
           <p className="font-sans line-through text-2xl md:text-3xl text-muted mt-3">
             De R$ {PRICE_FROM},00
@@ -1036,9 +1390,9 @@ function PrecoOferta() {
           <UrgencyCountdownBlock variant="card" />
 
           <div className="mt-8">
-            <CTA variant="huge" className="w-full">
+            <CTA variant="huge" showTrust className="w-full">
               <Gift className="w-5 h-5" />
-              SIM — QUERO O GUIA COMPLETO POR R$ {PRICE_TO}
+              Quero o guia completo por R$ {PRICE_TO}
               <ArrowRight className="w-5 h-5" />
             </CTA>
           </div>
@@ -1120,7 +1474,15 @@ const FAQS = [
   },
   {
     q: "Quais formas de pagamento são aceitas?",
-    a: `Cartão de crédito (em até ${INSTALLMENTS_COUNT}x de R$ ${PRICE_INSTALLMENTS}), Pix, boleto bancário e PayPal. Todo o checkout é processado pela Hotmart, com criptografia de ponta a ponta e segurança bancária.`,
+    a: `Cartão de crédito (em até ${INSTALLMENTS_COUNT}x de R$ ${PRICE_INSTALLMENTS}), Pix, boleto bancário e PayPal. A página de pagamento é da Hotmart, com criptografia e segurança bancária.`,
+  },
+  {
+    q: "O que é um PDF e como abro no celular?",
+    a: "PDF é um arquivo de leitura, como um livro digital. Após a compra, você recebe um link por e-mail. Toque no link no celular — o arquivo abre no navegador ou no app de arquivos. Você pode aumentar o tamanho da letra na tela ou imprimir em casa.",
+  },
+  {
+    q: "Não recebi o e-mail. O que faço?",
+    a: `Confira a caixa de spam e lixeira. O e-mail costuma vir da Hotmart em poucos minutos após o Pix ou cartão aprovado. Se não achar, escreva para ${SUPPORT_EMAIL} ou chame no WhatsApp pelo botão verde no canto da tela.`,
   },
   {
     q: "Existe garantia? E se eu não gostar?",
@@ -1142,11 +1504,14 @@ const FAQS = [
 
 function FAQ() {
   return (
-    <section className="py-20 md:py-28 px-6 bg-gradient-to-b from-background to-white">
+    <section
+      id="duvidas"
+      className="py-20 md:py-28 px-6 bg-gradient-to-b from-background to-white"
+    >
       <div className="max-w-3xl mx-auto">
         <div className="text-center mb-14">
-          <p className="font-sans uppercase tracking-[0.3em] text-xs md:text-sm text-secondary mb-4">
-            Perguntas Frequentes
+          <p className="font-sans text-sm font-semibold text-secondary mb-4 tracking-wide">
+            Perguntas frequentes
           </p>
           <h2 className="font-display font-bold text-3xl md:text-5xl text-foreground text-balance leading-tight">
             Antes de você se{" "}
@@ -1171,22 +1536,39 @@ function FAQ() {
                 />
               </summary>
               <div className="px-6 pb-6 -mt-1">
-                <p className="font-sans text-muted leading-relaxed">{f.a}</p>
+                <p className="font-sans text-base text-foreground/85 leading-relaxed">
+                  {f.a}
+                </p>
               </div>
             </details>
           ))}
         </div>
 
-        <div className="text-center mt-10">
-          <p className="font-sans text-sm text-muted">
-            Ainda com dúvidas?{" "}
-            <a
-              href="mailto:contato@mesadosprofetas.com"
-              className="text-accent hover:underline font-medium"
-            >
-              Fale com o suporte
-            </a>
-          </p>
+        <div className="text-center mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
+          <a
+            href={WHATSAPP_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-2 min-h-[48px] px-6 py-3 rounded-full bg-[#25D366] text-white font-sans font-semibold text-base"
+          >
+            <MessageCircle className="w-5 h-5" />
+            WhatsApp
+          </a>
+          <a
+            href={`mailto:${SUPPORT_EMAIL}`}
+            className="font-sans text-base text-foreground hover:text-secondary font-medium"
+          >
+            {SUPPORT_EMAIL}
+          </a>
+        </div>
+        <div className="text-center mt-8">
+          <a
+            href="#topo-barra"
+            className="inline-flex items-center gap-2 font-sans text-base text-secondary hover:text-foreground min-h-[48px] px-4"
+          >
+            <ChevronUp className="w-5 h-5" />
+            Voltar ao topo
+          </a>
         </div>
       </div>
     </section>
@@ -1211,54 +1593,62 @@ function CTAFinal() {
       />
 
       <div className="relative max-w-4xl mx-auto text-center">
-        <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-red-600 text-white text-xs sm:text-sm font-sans font-bold uppercase tracking-widest mb-6 animate-pulse">
-          <Flame className="w-4 h-4" />
-          Não feche esta página sem garantir seu acesso
+        <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-accent/20 border border-accent/40 text-accent text-sm sm:text-base font-sans font-semibold mb-6">
+          <Heart className="w-4 h-4" />
+          Sua mesa pode mudar ainda esta semana
         </span>
 
         <h2 className="font-display font-extrabold text-3xl md:text-5xl lg:text-6xl text-balance leading-tight">
-          Daqui a 6 meses, você pode estar
+          Está a um passo de sentar à mesa
           <br />
-          <span className="text-accent">cozinhando como os profetas</span>
-          <br />
-          — ou ainda adiando.
+          <span className="text-accent">como nos tempos bíblicos</span>
         </h2>
 
         <UrgencyCountdownBlock variant="final" />
 
-        <p className="font-serif italic text-lg md:text-2xl text-white/90 mt-8 max-w-2xl mx-auto text-balance leading-relaxed">
-          O guia culinário mais completo de receitas bíblicas do Brasil está a um clique.{" "}
-          <strong className="not-italic text-white">Amanhã o preço volta para R$ {PRICE_FROM} e os bônus somem.</strong>
+        <p className="font-sans text-lg md:text-xl text-white/90 mt-8 max-w-2xl mx-auto text-balance leading-relaxed">
+          O guia completo de receitas bíblicas, com presentes de R$ 111, por apenas R${" "}
+          {PRICE_TO} hoje. Amanhã o valor promocional pode não estar mais disponível.
         </p>
 
-        <div className="mt-10 inline-flex flex-col items-center gap-2 px-6 py-4 bg-foreground/40 backdrop-blur border border-accent/40 rounded-2xl">
-          <span className="font-sans text-sm uppercase tracking-widest text-white/70">
-            Você paga apenas
-          </span>
+        <div className="mt-10 inline-flex flex-col items-center gap-2 px-6 py-5 bg-foreground/40 backdrop-blur border border-accent/40 rounded-2xl">
+          <span className="font-sans text-base text-white/85">Investimento de hoje</span>
           <span className="font-display font-extrabold text-5xl md:text-6xl text-accent">
             R$ {PRICE_TO}
           </span>
-          <span className="font-sans text-sm text-white/80">
+          <span className="font-sans text-base text-white/85">
             ou {INSTALLMENTS_COUNT}x de R$ {PRICE_INSTALLMENTS}
           </span>
         </div>
 
-        <div className="flex flex-col items-center gap-3 mt-10">
-          <CTA variant="huge">
+        <div className="mt-10 max-w-lg mx-auto">
+          <CTA variant="huge" showTrust>
             <Gift className="w-5 h-5" />
-            GARANTIR MEU LUGAR NA MESA — R$ {PRICE_TO}
+            Quero receber o ebook na Hotmart — R$ {PRICE_TO}
             <ArrowRight className="w-5 h-5" />
           </CTA>
-          <p className="font-sans text-xs text-white/50 max-w-sm">
-            Ao clicar, você será levado ao checkout seguro da Hotmart. PDF no e-mail em minutos.
+          <p className="font-sans text-base text-white/75 mt-4 text-center">
+            Abre a página de pagamento segura. O PDF chega no seu e-mail em poucos
+            minutos.
           </p>
-          <a
-            href="mailto:contato@mesadosprofetas.com"
-            className="font-sans text-sm text-white/70 hover:text-accent transition-colors inline-flex items-center gap-2"
-          >
-            <Mail className="w-4 h-4" />
-            Ainda em dúvida? Fale com o suporte antes que o lote feche
-          </a>
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mt-6">
+            <a
+              href={WHATSAPP_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 text-white/90 hover:text-accent font-sans text-base min-h-[48px]"
+            >
+              <MessageCircle className="w-5 h-5" />
+              Dúvidas no WhatsApp
+            </a>
+            <a
+              href={`mailto:${SUPPORT_EMAIL}`}
+              className="font-sans text-base text-white/70 hover:text-accent transition-colors inline-flex items-center gap-2 min-h-[48px]"
+            >
+              <Mail className="w-4 h-4" />
+              {SUPPORT_EMAIL}
+            </a>
+          </div>
         </div>
 
         <div className="mt-10 grid grid-cols-1 sm:grid-cols-3 gap-4 max-w-2xl mx-auto text-sm">
@@ -1328,16 +1718,16 @@ function Footer() {
           </p>
           <p className="font-sans text-sm mt-3">
             <a
-              href="mailto:contato@mesadosprofetas.com"
+              href={`mailto:${SUPPORT_EMAIL}`}
               className="hover:text-accent transition-colors"
             >
-              contato@mesadosprofetas.com
+              {SUPPORT_EMAIL}
             </a>
           </p>
         </div>
       </div>
 
-      <div className="max-w-6xl mx-auto mt-12 pt-8 border-t border-background/10 flex flex-col sm:flex-row justify-between items-center gap-4 text-xs font-sans text-background/50">
+      <div className="max-w-6xl mx-auto mt-12 pt-8 border-t border-background/10 flex flex-col sm:flex-row justify-between items-center gap-4 text-sm font-sans text-background/50">
         <p>
           © 2026 A Mesa dos Profetas — Edição Premium. Todos os direitos
           reservados.
@@ -1352,21 +1742,24 @@ export default function Home() {
   return (
     <main className="min-h-screen bg-background text-foreground">
       <UrgencyBar />
+      <SiteNav />
       <Hero />
+      <ComoFunciona />
       <ParaQuemE />
-      <Galeria />
-      <Story />
       <Conteudo />
+      <Galeria />
       <Bonus />
       <Diferenciais />
       <SobreAutor />
       <Testemunhos />
       <AntesDepois />
+      <Story />
       <PrecoOferta />
       <Garantia />
       <FAQ />
       <CTAFinal />
       <Footer />
+      <FloatingActions />
     </main>
   );
 }

@@ -6,12 +6,18 @@ import {
   ShieldCheck,
   Clock,
   BookOpen,
-  Sparkles,
+  MessageCircle,
+  Mail,
 } from "lucide-react";
 
 const HOTMART_URL =
   "https://pay.hotmart.com/G105661402K?checkoutMode=10";
 const PDF_URL = "/downloads/guia-dos-alimentos-da-biblia.pdf";
+const SUPPORT_EMAIL = "contato@mesadosprofetas.com";
+const WHATSAPP_NUMBER = "5598999068855";
+const WHATSAPP_URL = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(
+  "Olá! Tenho uma dúvida sobre o Guia dos Alimentos da Bíblia."
+)}`;
 
 const SEGREDOS = [
   { n: "01", nome: "O Pão de Trigo", subtitulo: "O alimento que sustentou nações" },
@@ -25,6 +31,9 @@ const SEGREDOS = [
   { n: "09", nome: "O Vinho Novo", subtitulo: "A bebida da celebração" },
   { n: "10", nome: "A Água", subtitulo: "O fundamento da vida" },
 ];
+
+const btnPrimary =
+  "inline-flex items-center justify-center gap-3 px-8 py-4 min-h-[48px] rounded-full font-sans font-bold text-base sm:text-lg bg-accent text-foreground hover:bg-accent-300 shadow-gold transition-all duration-300 cursor-pointer";
 
 function triggerDownload() {
   const link = document.createElement("a");
@@ -63,68 +72,58 @@ export default function Leads() {
 
         <div className="relative max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center">
           <div className="text-center lg:text-left">
-            <p className="font-sans uppercase tracking-[0.4em] text-accent text-xs md:text-sm mb-5">
-              ✦ Guia Gratuito · 15 Páginas ✦
+            <p className="font-sans text-sm font-semibold text-accent mb-5 tracking-wide">
+              Guia gratuito · 15 páginas · PDF
             </p>
-            <h1 className="font-display font-extrabold text-3xl sm:text-4xl md:text-5xl lg:text-6xl leading-[1.1] text-balance">
+            <h1 className="font-display font-extrabold text-3xl sm:text-4xl md:text-5xl leading-[1.15] text-balance">
               O Guia dos Alimentos da{" "}
               <span className="text-accent">Bíblia</span>
             </h1>
-            <p className="font-serif italic text-lg md:text-2xl mt-6 text-white/90 text-balance leading-relaxed">
-              Os 10 Segredos Alimentares que sustentaram profetas, curaram reis
-              e alimentaram multidões.
+            <p className="font-sans text-lg md:text-xl mt-6 text-white/90 text-balance leading-relaxed">
+              Os 10 segredos alimentares que sustentaram profetas, curaram reis
+              e alimentaram multidões — linguagem clara, pronta para ler ou
+              imprimir.
             </p>
-            <p className="font-sans text-base md:text-lg mt-4 text-white/70 text-balance">
-              Baixe gratuitamente e descubra os alimentos sagrados que a ciência
-              moderna está apenas começando a entender.
+            <p className="font-sans text-base md:text-lg mt-4 text-white/80 text-balance">
+              Sem cadastro. Um clique e o arquivo baixa no seu celular ou
+              computador.
             </p>
 
             <div className="mt-10 flex flex-col sm:flex-row gap-4 items-center justify-center lg:justify-start">
-              <button
-                onClick={handleDownload}
-                className="inline-flex items-center justify-center gap-3 px-8 py-4 rounded-full font-sans font-medium tracking-wide bg-accent text-foreground hover:bg-accent-300 shadow-gold hover:shadow-2xl hover:-translate-y-0.5 transition-all duration-300 cursor-pointer"
-              >
+              <button type="button" onClick={handleDownload} className={btnPrimary}>
                 <Download className="w-5 h-5" />
-                {downloaded ? "Baixado! Baixar Novamente" : "Baixar Guia Grátis (PDF)"}
+                {downloaded ? "Baixar novamente (PDF)" : "Baixar guia grátis (PDF)"}
               </button>
             </div>
 
             {downloaded && (
-              <div className="mt-6 inline-flex items-center gap-2 px-4 py-2 rounded-full bg-accent/20 border border-accent/40 text-accent text-sm font-sans animate-fade-up">
-                <Check className="w-4 h-4" />
-                Download iniciado — confira sua pasta de downloads
+              <div className="mt-6 inline-flex items-center gap-2 px-4 py-3 rounded-full bg-accent/20 border border-accent/40 text-accent text-base font-sans">
+                <Check className="w-5 h-5" />
+                Download iniciado — confira a pasta de downloads
               </div>
             )}
 
-            <div className="mt-8 grid grid-cols-1 sm:grid-cols-3 gap-4 max-w-xl mx-auto lg:mx-0 text-sm">
-              <div className="flex items-center justify-center lg:justify-start gap-2 text-white/80">
-                <ShieldCheck className="w-4 h-4 text-accent" />
-                <span>100% Gratuito</span>
+            <div className="mt-8 grid grid-cols-1 sm:grid-cols-3 gap-4 max-w-xl mx-auto lg:mx-0 text-base">
+              <div className="flex items-center justify-center lg:justify-start gap-2 text-white/85">
+                <ShieldCheck className="w-5 h-5 text-accent" />
+                <span>100% gratuito</span>
               </div>
-              <div className="flex items-center justify-center lg:justify-start gap-2 text-white/80">
-                <Clock className="w-4 h-4 text-accent" />
-                <span>Acesso Imediato</span>
+              <div className="flex items-center justify-center lg:justify-start gap-2 text-white/85">
+                <Clock className="w-5 h-5 text-accent" />
+                <span>Na hora</span>
               </div>
-              <div className="flex items-center justify-center lg:justify-start gap-2 text-white/80">
-                <BookOpen className="w-4 h-4 text-accent" />
-                <span>Sem Cadastro</span>
+              <div className="flex items-center justify-center lg:justify-start gap-2 text-white/85">
+                <BookOpen className="w-5 h-5 text-accent" />
+                <span>Sem cadastro</span>
               </div>
             </div>
           </div>
 
           <div className="relative order-first lg:order-last">
-            <div
-              className="absolute -inset-8 rounded-full opacity-50 blur-3xl"
-              style={{
-                background:
-                  "radial-gradient(circle, #D4AF37 0%, transparent 70%)",
-              }}
-              aria-hidden="true"
-            />
             <img
               src="/images/guia-mockup.png"
-              alt="Mockup 3D do Guia dos Alimentos da Bíblia"
-              className="relative w-full max-w-sm mx-auto drop-shadow-2xl hover:scale-105 transition-transform duration-500"
+              alt="Mockup do Guia dos Alimentos da Bíblia"
+              className="relative w-full max-w-sm mx-auto drop-shadow-2xl"
               loading="eager"
             />
           </div>
@@ -134,16 +133,16 @@ export default function Leads() {
       <section className="py-20 md:py-28 px-6 bg-white">
         <div className="max-w-5xl mx-auto">
           <div className="text-center mb-14">
-            <p className="font-sans uppercase tracking-[0.3em] text-xs md:text-sm text-secondary mb-4">
+            <p className="font-sans text-sm font-semibold text-secondary mb-4 tracking-wide">
               O que você vai descobrir
             </p>
             <h2 className="font-display font-bold text-3xl md:text-5xl text-foreground text-balance leading-tight">
               Os 10 alimentos sagrados da Bíblia
             </h2>
             <div className="gold-divider mt-6" />
-            <p className="font-serif italic text-lg text-muted mt-6 max-w-2xl mx-auto">
-              Cada alimento foi escolhido por Deus para um propósito específico.
-              Cada um pode transformar sua vida hoje.
+            <p className="font-sans text-lg text-foreground/85 mt-6 max-w-2xl mx-auto leading-relaxed">
+              Cada alimento foi escolhido por Deus para um propósito. Você vai
+              entender o significado e como usar na sua mesa hoje.
             </p>
           </div>
 
@@ -151,35 +150,30 @@ export default function Leads() {
             {SEGREDOS.map((s) => (
               <div
                 key={s.n}
-                className="group flex items-start gap-5 bg-background/60 hover:bg-white border-l-4 border-accent rounded-r-xl p-5 hover:shadow-lg transition-all duration-300"
+                className="flex items-start gap-5 bg-background/60 border-l-4 border-accent rounded-r-xl p-6"
               >
-                <div className="flex-shrink-0 w-12 h-12 rounded-full bg-accent/15 group-hover:bg-accent flex items-center justify-center transition-colors">
-                  <span className="font-display font-bold text-lg text-accent group-hover:text-white transition-colors">
+                <div className="flex-shrink-0 w-12 h-12 rounded-full bg-accent/15 flex items-center justify-center">
+                  <span className="font-display font-bold text-lg text-accent">
                     {s.n}
                   </span>
                 </div>
                 <div>
-                  <h3 className="font-display font-bold text-lg text-foreground">
+                  <h3 className="font-display font-bold text-xl text-foreground">
                     {s.nome}
                   </h3>
-                  <p className="font-serif italic text-sm text-muted mt-1">
-                    {s.subtitulo}
-                  </p>
+                  <p className="font-sans text-base text-muted mt-1">{s.subtitulo}</p>
                 </div>
               </div>
             ))}
           </div>
 
           <div className="text-center mt-14">
-            <button
-              onClick={handleDownload}
-              className="inline-flex items-center justify-center gap-3 px-8 py-4 rounded-full font-sans font-medium tracking-wide bg-foreground text-accent hover:bg-secondary hover:text-white shadow-xl hover:-translate-y-0.5 transition-all duration-300 cursor-pointer"
-            >
+            <button type="button" onClick={handleDownload} className={btnPrimary}>
               <Download className="w-5 h-5" />
-              Baixar o Guia Completo Agora
+              Baixar o guia completo agora
             </button>
-            <p className="mt-4 text-sm text-muted font-sans">
-              PDF de 15 páginas · 70 KB · Pronto para imprimir
+            <p className="mt-4 text-base text-muted font-sans">
+              PDF de 15 páginas · pode imprimir em casa
             </p>
           </div>
         </div>
@@ -192,15 +186,6 @@ export default function Leads() {
             "linear-gradient(135deg, #3D2817 0%, #5C3A22 50%, #C67C4E 100%)",
         }}
       >
-        <div
-          className="absolute inset-0 opacity-10"
-          style={{
-            backgroundImage:
-              "radial-gradient(circle at 30% 50%, #D4AF37 0%, transparent 50%), radial-gradient(circle at 70% 80%, #D4AF37 0%, transparent 50%)",
-          }}
-          aria-hidden="true"
-        />
-
         <div className="relative max-w-5xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
           <div className="relative">
             <img
@@ -212,29 +197,24 @@ export default function Leads() {
           </div>
 
           <div className="text-center lg:text-left">
-            <p className="inline-flex items-center gap-2 font-sans uppercase tracking-[0.3em] text-accent text-xs md:text-sm mb-5">
-              <Sparkles className="w-4 h-4" />
-              Quer ir além?
+            <p className="font-sans text-sm font-semibold text-accent mb-5 tracking-wide">
+              Quer o passo a passo completo?
             </p>
             <h2 className="font-display font-extrabold text-3xl md:text-5xl text-white text-balance leading-tight">
-              Conheça o passo a passo completo
+              21 receitas bíblicas na sua cozinha
             </h2>
-            <p className="font-serif italic text-lg md:text-xl text-white/85 mt-6 leading-relaxed text-balance">
-              Conhecer os 10 alimentos é só o começo. Em{" "}
-              <strong className="text-accent not-italic font-semibold">
-                A Mesa dos Profetas
-              </strong>{" "}
-              você recebe 21 receitas completas com história bíblica,
-              ingredientes adaptados ao Brasil, modo de preparo passo a passo e
-              explicação científica.
+            <p className="font-sans text-lg md:text-xl text-white/90 mt-6 leading-relaxed text-balance">
+              Em <strong className="text-accent">A Mesa dos Profetas</strong>{" "}
+              você recebe receitas completas, plano de 7 dias, lista de compras
+              e reflexões espirituais — pagamento seguro na Hotmart.
             </p>
 
-            <ul className="mt-8 space-y-3 text-left max-w-md mx-auto lg:mx-0">
+            <ul className="mt-8 space-y-3 text-left max-w-md mx-auto lg:mx-0 text-base">
               {[
-                "21 receitas bíblicas detalhadas",
-                "Plano alimentar de 7 dias completo",
-                "Lista de compras pronta para imprimir",
-                "Reflexões espirituais para cada receita",
+                "21 receitas com história bíblica",
+                "Plano alimentar de 7 dias",
+                "Lista de compras para imprimir",
+                "Garantia de 7 dias",
               ].map((item) => (
                 <li
                   key={item}
@@ -246,16 +226,14 @@ export default function Leads() {
               ))}
             </ul>
 
-            <div className="mt-10">
-              <a
-                href={HOTMART_URL}
-                className="inline-flex items-center justify-center gap-3 px-8 py-4 rounded-full font-sans font-medium tracking-wide bg-accent text-foreground hover:bg-accent-300 shadow-gold hover:shadow-2xl hover:-translate-y-0.5 transition-all duration-300 cursor-pointer"
-              >
-                Acessar A Mesa dos Profetas
+            <div className="mt-10 flex flex-col gap-4 items-center lg:items-start">
+              <a href={HOTMART_URL} className={btnPrimary}>
+                Ver ebook na Hotmart — pagamento seguro
                 <ArrowRight className="w-5 h-5" />
               </a>
-              <p className="mt-3 text-xs uppercase tracking-widest text-white/60">
-                Acesso imediato · Garantia de 7 dias
+              <p className="font-sans text-base text-white/80 flex items-center gap-2">
+                <ShieldCheck className="w-5 h-5 text-accent" />
+                7 dias para experimentar — devolução total
               </p>
             </div>
           </div>
@@ -263,19 +241,42 @@ export default function Leads() {
       </section>
 
       <footer className="bg-foreground text-background/70 px-6 py-10">
-        <div className="max-w-6xl mx-auto flex flex-col sm:flex-row justify-between items-center gap-4 text-xs font-sans">
-          <p>
-            © 2026 A Mesa dos Profetas — Edição Premium. Todos os direitos
-            reservados.
-          </p>
-          <a
-            href="/"
-            className="text-accent hover:text-accent-300 transition-colors"
-          >
-            ← Voltar para a página principal
-          </a>
+        <div className="max-w-6xl mx-auto flex flex-col sm:flex-row justify-between items-center gap-4 text-sm font-sans">
+          <p>© 2026 A Mesa dos Profetas. Todos os direitos reservados.</p>
+          <div className="flex flex-wrap items-center gap-4">
+            <a
+              href={WHATSAPP_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 text-[#25D366] hover:brightness-110 min-h-[48px]"
+            >
+              <MessageCircle className="w-5 h-5" />
+              WhatsApp
+            </a>
+            <a
+              href={`mailto:${SUPPORT_EMAIL}`}
+              className="inline-flex items-center gap-2 text-accent hover:text-accent-300 min-h-[48px]"
+            >
+              <Mail className="w-4 h-4" />
+              {SUPPORT_EMAIL}
+            </a>
+            <a href="/" className="text-accent hover:text-accent-300 min-h-[48px] flex items-center">
+              ← Página principal
+            </a>
+          </div>
         </div>
       </footer>
+
+      <a
+        href={WHATSAPP_URL}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="fixed bottom-6 right-6 z-50 flex items-center gap-2 bg-[#25D366] text-white font-sans font-bold text-base px-4 py-3 min-h-[48px] rounded-full shadow-2xl"
+        aria-label="Dúvidas no WhatsApp"
+      >
+        <MessageCircle className="w-6 h-6" />
+        <span className="hidden sm:inline">Dúvidas?</span>
+      </a>
     </main>
   );
 }
