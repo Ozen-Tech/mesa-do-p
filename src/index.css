@@ -7,7 +7,7 @@
   --color-secondary: #c67c4e;
   --color-foreground: #3d2817;
   --color-background: #f5e6d3;
-  --color-muted: #8a7060;
+  --color-muted: #6b5344;
 }
 
 html {
@@ -19,9 +19,15 @@ html {
 body {
   font-family: "Inter", system-ui, sans-serif;
   font-size: 1.125rem;
-  line-height: 1.65;
+  line-height: 1.75;
   background-color: var(--color-background);
   color: var(--color-foreground);
+}
+
+@media (max-width: 640px) {
+  body {
+    font-size: 1.0625rem;
+  }
 }
 
 @layer utilities {
@@ -45,6 +51,7 @@ body {
 details > summary {
   list-style: none;
   cursor: pointer;
+  min-height: 48px;
 }
 details > summary::-webkit-details-marker {
   display: none;

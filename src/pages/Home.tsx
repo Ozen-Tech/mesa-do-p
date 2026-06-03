@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import {
   BookOpen,
-  Microscope,
   Utensils,
   Star,
   ChevronDown,
@@ -21,6 +20,8 @@ import {
   MousePointerClick,
   FileText,
   Menu,
+  Youtube,
+  Lock,
 } from "lucide-react";
 
 const HOTMART_URL =
@@ -36,17 +37,99 @@ const PRICE_TO = "67";
 const PRICE_INSTALLMENTS = "6,46";
 const INSTALLMENTS_COUNT = "12";
 
+const YOUTUBE = {
+  channelName: "Nutrição Bíblica",
+  channelUrl:
+    "https://youtube.com/@nutricaobiblicaa?si=IUoNgBuA2efCIRp1",
+  subscribers: "6.500",
+  totalViews: "150 mil",
+  videoCount: "",
+  tagline:
+    "Conteúdo semanal sobre alimentação natural, receitas bíblicas e saúde com base nas Escrituras.",
+};
+
 const NAV_LINKS = [
   { href: "#inicio", label: "Início" },
-  { href: "#conteudo", label: "O que inclui" },
+  { href: "#problema", label: "Para quem é" },
+  { href: "#receitas", label: "Receitas" },
   { href: "#depoimentos", label: "Depoimentos" },
-  { href: "#preco", label: "Preço" },
+  { href: "#oferta", label: "Oferta" },
   { href: "#duvidas", label: "Dúvidas" },
   { href: HOTMART_URL, label: "Comprar", external: true },
 ] as const;
 
+const CATEGORIAS_RECEITAS = [
+  {
+    titulo: "Pão de Ezequiel",
+    qtd: 2,
+    desc: "Proteína completa de grãos e leguminosas — o pão que sustentou o profeta.",
+    img: "/images/receita-01-pao-ezequiel.jpg",
+  },
+  {
+    titulo: "Sopa de Lentilhas",
+    qtd: 3,
+    desc: "Pratos reconfortantes de Esaú, da viúva de Sarepta e dos patriarcas.",
+    img: "/images/receita-02-sopa-lentilhas.jpg",
+  },
+  {
+    titulo: "Pasta de Figo",
+    qtd: 1,
+    desc: "O remédio doce que curou o Rei Ezequias — simples e acessível.",
+    img: "/images/receita-03-pasta-figo.jpg",
+  },
+  {
+    titulo: "Receitas dos Patriarcas",
+    qtd: 4,
+    desc: "Abraão, Davi, Jacó e Boaz — mesa de hospitalidade e provisão.",
+    img: "/images/receita-categoria-patriarcas.jpg",
+  },
+  {
+    titulo: "Receitas Festivas",
+    qtd: 3,
+    desc: "Páscoa, casamento em Caná e banquetes de celebração.",
+    img: "/images/receita-categoria-festivas.jpg",
+  },
+  {
+    titulo: "Receitas do Deserto",
+    qtd: 5,
+    desc: "Elias, João Batista, maná e provisão no tempo da provação.",
+    img: "/images/receita-categoria-deserto.jpg",
+  },
+  {
+    titulo: "Receitas dos Reis",
+    qtd: 3,
+    desc: "Ezequias, Salomão e banquetes dignos de palácio.",
+    img: "/images/receita-categoria-reis.jpg",
+  },
+] as const;
+
+const OFERTA_ITENS = [
+  "Livro digital completo (PDF)",
+  "21 receitas bíblicas passo a passo",
+  "História e contexto de cada receita",
+  "Referências bíblicas em cada capítulo",
+  "Modo de preparo adaptado ao Brasil",
+  "Acesso imediato após a compra",
+  "Acesso vitalício — baixe quantas vezes quiser",
+] as const;
+
+const BONUS_FUTUROS = [
+  {
+    titulo: "Plano Daniel 21 Dias",
+    desc: "Jornada alimentar inspirada em Daniel 1 — em breve.",
+  },
+  {
+    titulo: "Lista de Compras Bíblica",
+    desc: "Versão ampliada da despensa sagrada — em breve.",
+  },
+  {
+    titulo: "Guia da Despensa Sagrada",
+    desc: "Organize sua cozinha com os alimentos das Escrituras — em breve.",
+  },
+] as const;
+
 const ctaClasses =
-  "inline-flex items-center justify-center gap-2 px-6 sm:px-10 py-4 sm:py-5 min-h-[48px] rounded-full font-sans font-bold tracking-normal transition-all duration-300 ease-out cursor-pointer text-base sm:text-lg hover:-translate-y-0.5";
+  "hotmart-fb hotmart__button-checkout inline-flex items-center justify-center gap-2 px-6 sm:px-10 py-4 sm:py-5 min-h-[48px] rounded-full font-sans font-bold tracking-normal transition-all duration-300 ease-out cursor-pointer text-base sm:text-lg hover:-translate-y-0.5";
 
 function useReducedMotion() {
   const [reduced, setReduced] = useState(false);
@@ -137,7 +220,15 @@ function CTA({
 
   return (
     <div className={`flex flex-col items-center gap-3 w-full ${className}`}>
-      <a href={HOTMART_URL} className={`${ctaClasses} ${variants[variant]} w-full sm:w-auto`}>
+      <a
+        href={HOTMART_URL}
+        onClick={(e) => {
+          if (typeof window !== "undefined" && (window as Window & { hotmart?: unknown }).hotmart) {
+            e.preventDefault();
+          }
+        }}
+        className={`${ctaClasses} ${variants[variant]} w-full sm:w-auto`}
+      >
         {children}
       </a>
       {showTrust && (
@@ -534,32 +625,29 @@ function Hero() {
       <div className="relative z-10 flex flex-col items-center justify-center min-h-[100vh] px-6 py-20 text-center max-w-5xl mx-auto">
         <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-accent/20 border border-accent/50 text-accent text-sm sm:text-base font-sans font-semibold mb-6">
           <BookOpen className="w-4 h-4" />
-          21 receitas bíblicas · passo a passo · acesso vitalício
+          21 receitas · ingredientes do supermercado · acesso vitalício
         </span>
 
-        <h1 className="font-display font-extrabold text-3xl sm:text-4xl md:text-5xl lg:text-6xl leading-[1.15] text-balance">
-          21 receitas bíblicas para sua cozinha — com oração e significado em
-          cada prato
+        <h1 className="font-display font-extrabold text-3xl sm:text-4xl md:text-[2.75rem] lg:text-5xl leading-[1.2] text-balance">
+          Descubra como alimentar sua família com princípios bíblicos usando
+          ingredientes simples do supermercado comum
         </h1>
 
-        <p className="font-sans text-lg md:text-xl mt-8 max-w-3xl text-white/95 text-balance leading-relaxed">
-          Ingredientes do mercado da esquina, modo de preparo claro e reflexão
-          espiritual. Pode ler no celular, aumentar a letra ou imprimir o PDF.
+        <p className="font-serif italic text-lg md:text-2xl mt-8 max-w-3xl text-white/95 text-balance leading-relaxed">
+          21 receitas inspiradas nas Escrituras, adaptadas para a cozinha
+          brasileira, com história bíblica, contexto espiritual e preparo passo
+          a passo.
         </p>
 
         <p className="font-sans text-base md:text-lg mt-4 text-white/85 max-w-2xl">
-          Mais de <strong className="text-accent">1.000 famílias</strong> já
-          usam o guia em estudos de família e células.
+          Para quem busca <strong className="text-white">menos inflamação</strong>,{" "}
+          <strong className="text-white">mais energia</strong> e uma mesa que
+          une fé e alimentação natural — sem dietas complicadas.
         </p>
-
-        <div className="w-full max-w-md bg-foreground/50 backdrop-blur border border-accent/40 rounded-2xl px-5 py-4 mt-6">
-          <UrgencyCountdownBlock variant="hero" />
-        </div>
 
         <div className="mt-8 w-full max-w-lg">
           <CTA variant="huge" showTrust>
-            <Gift className="w-5 h-5" />
-            Quero o guia completo — pagamento seguro
+            Quero Acessar A Mesa dos Profetas
             <ArrowRight className="w-5 h-5" />
           </CTA>
           <p className="font-sans text-base text-white/85 mt-4 text-center">
@@ -587,7 +675,7 @@ function Hero() {
         </div>
 
         <a
-          href="#para-quem"
+          href="#problema"
           aria-label="Rolar para a próxima seção"
           className="absolute bottom-6 left-1/2 -translate-x-1/2 text-accent animate-bounce-slow"
         >
@@ -600,61 +688,195 @@ function Hero() {
 
 const DORES = [
   {
-    title: "Cansado de dietas que prometem e não entregam?",
-    desc: "Você troca o pão de Ezequiel pelo industrial, o azeite da unção pela margarina — e ainda se culpa. Chegou a hora de comer como quem foi criado à imagem de Deus.",
+    title: "Você se sente cansada(o) e sem energia?",
+    desc: "Ultraprocessados, açúcar escondido e refeições sem propósito pesam no corpo — e muitas vezes também na alma.",
   },
   {
-    title: "Quer uma mesa que nutre corpo E alma?",
-    desc: "Não é só receita: é história bíblica, ciência moderna e reflexão espiritual em cada prato. Sua família vai sentir a diferença na primeira semana.",
+    title: "Sua mesa ficou cheia de industrializados?",
+    desc: "Margarina, pão branco, temperos prontos… Você sabe que não é o ideal, mas falta inspiração prática para voltar ao natural.",
   },
   {
-    title: "Sonha em cozinhar com propósito — sem complicação?",
-    desc: "Ingredientes de mercado, passo a passo claro, zero gourmetização. Se você sabe ferver água, você consegue preparar como na mesa dos profetas.",
+    title: "Quer cuidar da saúde sem dietas complicadas?",
+    desc: "Sem contar calorias obsessivamente. Com ingredientes simples, encontrados em qualquer supermercado brasileiro.",
+  },
+  {
+    title: "Sente que se afastou dos alimentos que Deus criou?",
+    desc: "A Bíblia descreve grãos, azeite, mel, legumes e frutas como provisão — não como punição. É hora de reconectar fé e mesa.",
   },
 ];
 
-function ParaQuemE() {
+function ProblemaSection() {
   return (
-    <section id="para-quem" className="py-20 md:py-28 px-6 bg-white">
+    <section id="problema" className="py-20 md:py-28 px-6 bg-white">
       <div className="max-w-5xl mx-auto">
         <div className="text-center mb-14">
-          <p className="font-sans uppercase tracking-[0.3em] text-xs md:text-sm text-secondary mb-4">
-            Este Ebook é para você se...
+          <p className="font-sans text-sm font-semibold text-secondary mb-4 tracking-wide">
+            Você não está sozinha(o)
           </p>
-          <h2 className="font-display font-bold text-3xl md:text-5xl text-foreground text-balance leading-tight">
-            Identifica-se com{" "}
-            <span className="text-secondary">uma destas situações?</span>
+          <h2 className="font-display font-bold text-3xl md:text-4xl lg:text-5xl text-foreground text-balance leading-tight">
+            Muitas famílias cristãs vivem o mesmo{" "}
+            <span className="text-secondary">ciclo de cansaço e confusão</span>{" "}
+            na alimentação
           </h2>
           <div className="gold-divider mt-6" />
+          <p className="font-sans text-lg text-foreground/85 mt-6 max-w-3xl mx-auto leading-relaxed">
+            Não é falta de fé. É falta de um caminho claro — prático, acessível e
+            alinhado com os princípios alimentares que aparecem nas Escrituras.
+          </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {DORES.map((d) => (
             <div
               key={d.title}
-              className="bg-background/70 border-l-4 border-accent rounded-r-2xl p-6 hover:shadow-2xl transition-shadow"
+              className="bg-background/70 border-l-4 border-secondary rounded-r-2xl p-6 md:p-8"
             >
-              <Check className="w-8 h-8 text-accent mb-3" />
-              <h3 className="font-display font-bold text-xl text-foreground leading-snug">
+              <h3 className="font-display font-bold text-xl md:text-2xl text-foreground leading-snug">
                 {d.title}
               </h3>
-              <p className="font-sans text-muted mt-3 leading-relaxed">
+              <p className="font-sans text-foreground/85 mt-3 leading-relaxed text-base md:text-lg">
                 {d.desc}
               </p>
             </div>
           ))}
         </div>
 
-        <div className="text-center mt-12">
-          <p className="font-serif italic text-lg md:text-2xl text-foreground text-balance max-w-3xl mx-auto">
-            Se você se reconheceu em <strong className="not-italic">qualquer uma</strong>, não espere mais um domingo passar com a mesa vazia de propósito.{" "}
-            <strong className="not-italic text-secondary">O guia está pronto para você.</strong>
+        <blockquote className="mt-12 px-6 py-8 border-l-4 border-accent bg-background/80 rounded-r-2xl max-w-3xl mx-auto">
+          <p className="font-serif italic text-lg md:text-xl text-foreground leading-relaxed">
+            &ldquo;Eis que vos tenho dado toda a erva que dê semente… ser-vos-á
+            para mantimento.&rdquo;
           </p>
-          <div className="mt-8">
-            <CTA variant="primary">
-              QUERO TRANSFORMAR MINHA MESA AGORA
-              <ArrowRight className="w-5 h-5" />
-            </CTA>
+          <cite className="block mt-4 font-sans text-sm uppercase tracking-widest text-secondary not-italic">
+            — Gênesis 1:29
+          </cite>
+        </blockquote>
+
+        <div className="text-center mt-12">
+          <CTA variant="primary" showTrust>
+            Quero Acessar A Mesa dos Profetas
+            <ArrowRight className="w-5 h-5" />
+          </CTA>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+const TOTAL_RECEITAS = CATEGORIAS_RECEITAS.reduce((s, c) => s + c.qtd, 0);
+
+function OQueVoceRecebe() {
+  return (
+    <section id="receitas" className="py-20 md:py-28 px-6 bg-background">
+      <div className="max-w-7xl mx-auto">
+        <div className="text-center mb-14">
+          <p className="font-sans text-sm font-semibold text-secondary mb-4 tracking-wide">
+            O que você recebe
+          </p>
+          <h2 className="font-display font-bold text-3xl md:text-4xl lg:text-5xl text-foreground text-balance leading-tight">
+            <span className="text-secondary">{TOTAL_RECEITAS} receitas</span>{" "}
+            organizadas por tema bíblico
+          </h2>
+          <div className="gold-divider mt-6" />
+          <p className="font-sans text-lg text-foreground/85 mt-6 max-w-3xl mx-auto">
+            Cada categoria traz história bíblica, referência das Escrituras,
+            modo de preparo adaptado ao Brasil e reflexão espiritual.
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
+          {CATEGORIAS_RECEITAS.map((cat) => (
+            <article
+              key={cat.titulo}
+              className="bg-white rounded-2xl overflow-hidden border-2 border-transparent hover:border-accent shadow-md hover:shadow-xl transition-all duration-300 flex flex-col"
+            >
+              <div className="aspect-[4/3] overflow-hidden">
+                <img
+                  src={cat.img}
+                  alt={cat.titulo}
+                  loading="lazy"
+                  className="w-full h-full object-cover"
+                />
+              </div>
+              <div className="p-5 flex-1 flex flex-col">
+                <span className="inline-flex self-start px-3 py-1 rounded-full bg-accent/15 text-secondary font-sans text-sm font-bold mb-3">
+                  {cat.qtd} {cat.qtd === 1 ? "receita" : "receitas"}
+                </span>
+                <h3 className="font-display font-bold text-xl text-foreground leading-snug">
+                  {cat.titulo}
+                </h3>
+                <p className="font-sans text-foreground/80 mt-2 text-base leading-relaxed flex-1">
+                  {cat.desc}
+                </p>
+              </div>
+            </article>
+          ))}
+        </div>
+
+        <p className="text-center font-display font-bold text-2xl md:text-3xl text-foreground mt-12">
+          Total:{" "}
+          <span className="text-accent">{TOTAL_RECEITAS} receitas completas</span>
+        </p>
+
+        <div className="text-center mt-10">
+          <CTA variant="primary" showTrust>
+            Quero Acessar A Mesa dos Profetas
+            <ArrowRight className="w-5 h-5" />
+          </CTA>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function MecanismoUnico() {
+  return (
+    <section
+      id="mecanismo"
+      className="py-20 md:py-28 px-6 text-white"
+      style={{
+        background:
+          "linear-gradient(135deg, #1F1208 0%, #3D2817 50%, #5C3A22 100%)",
+      }}
+    >
+      <div className="max-w-5xl mx-auto">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+          <div>
+            <p className="font-sans text-sm font-semibold text-accent mb-4 tracking-wide uppercase">
+              O que torna este ebook diferente
+            </p>
+            <h2 className="font-display font-bold text-3xl md:text-4xl lg:text-5xl leading-tight text-balance">
+              A Mesa dos Profetas{" "}
+              <span className="text-accent">não é um livro de receitas comum</span>
+            </h2>
+            <div className="gold-divider mt-6 !mx-0" />
+            <p className="font-sans text-lg md:text-xl text-white/90 mt-8 leading-relaxed">
+              É uma <strong className="text-white">reconstrução moderna</strong> de
+              receitas inspiradas nas Escrituras — com ingredientes que você encontra
+              no mercado da esquina, passo a passo claro e contexto espiritual em
+              cada prato.
+            </p>
+            <ul className="mt-8 space-y-4">
+              {[
+                "História bíblica completa de cada alimento",
+                "Referência do versículo e personagem",
+                "Modo de preparo adaptado ao Brasil",
+                "Explicação do porquê a combinação funciona",
+                "Reflexão para aplicar na sua rotina de fé",
+              ].map((item) => (
+                <li key={item} className="flex items-start gap-3 font-sans text-white/90 text-base md:text-lg">
+                  <Check className="w-5 h-5 text-accent flex-shrink-0 mt-1" />
+                  {item}
+                </li>
+              ))}
+            </ul>
+          </div>
+          <div className="relative">
+            <img
+              src="/images/ebook-mockup.png"
+              alt="Capa do ebook A Mesa dos Profetas"
+              loading="lazy"
+              className="w-full max-w-sm mx-auto drop-shadow-2xl"
+            />
           </div>
         </div>
       </div>
@@ -723,120 +945,6 @@ function Galeria() {
           <CTA variant="primary">
             <Utensils className="w-5 h-5" />
             QUERO PREPARAR ESSAS RECEITAS HOJE
-            <ArrowRight className="w-5 h-5" />
-          </CTA>
-        </div>
-      </div>
-    </section>
-  );
-}
-
-function Story() {
-  return (
-    <section
-      className="py-20 md:py-28 px-6 text-white relative overflow-hidden"
-      style={{
-        background:
-          "linear-gradient(135deg, #1F1208 0%, #3D2817 50%, #5C3A22 100%)",
-      }}
-    >
-      <div className="max-w-4xl mx-auto text-center">
-        <p className="font-sans uppercase tracking-[0.3em] text-xs md:text-sm text-accent mb-4">
-          O Segredo Perdido
-        </p>
-        <h2 className="font-display font-bold text-3xl md:text-5xl lg:text-6xl text-white text-balance leading-tight">
-          E se a resposta para sua{" "}
-          <span className="text-accent">saúde e fé</span>
-          <br />
-          estivesse escondida nas páginas da Bíblia?
-        </h2>
-        <div className="gold-divider mt-6" />
-
-        <p className="font-serif text-lg md:text-2xl text-white/90 mt-10 leading-relaxed text-balance">
-          Hoje vivemos na era da abundância. Mas <strong className="text-accent not-italic">nunca estivemos tão doentes, tão cansados e tão desconectados</strong> do que realmente nutre nossa alma e nosso corpo.
-        </p>
-
-        <p className="font-serif text-lg md:text-xl text-white/80 mt-8 leading-relaxed text-balance">
-          Trocamos a <strong className="text-white not-italic">sabedoria milenar</strong> pela pressa moderna. Trocamos o pão de Ezequiel pelo pão branco do supermercado. Trocamos o azeite da unção pela margarina industrial. Trocamos o mel das ervas pelo refrigerante diet.
-        </p>
-
-        <blockquote className="mt-12 px-6 py-8 border-l-4 border-accent bg-foreground/40 rounded-r-lg max-w-2xl mx-auto text-left">
-          <p className="font-serif italic text-lg md:text-xl text-white leading-relaxed">
-            "Eis que vos tenho dado toda a erva que dê semente, que está sobre a face de toda a terra; e toda a árvore, em que há fruto que dê semente, ser-vos-á para mantimento."
-          </p>
-          <cite className="block mt-4 font-sans text-sm uppercase tracking-widest text-accent not-italic">
-            — Gênesis 1:29
-          </cite>
-        </blockquote>
-
-        <p className="font-serif text-lg md:text-2xl text-white mt-10 leading-relaxed text-balance">
-          A Mesa dos Profetas <strong className="text-accent not-italic">não é apenas um livro de receitas</strong>. É um convite para retornar à origem.
-        </p>
-      </div>
-    </section>
-  );
-}
-
-const CONTEUDO = [
-  "21 receitas bíblicas completas com história, ciência e reflexão",
-  "Pão de Ezequiel: a proteína completa que sustentou um profeta",
-  "Sopa de Lentilhas de Esaú: o prato que mudou um destino",
-  "Pasta de Figo: o remédio que curou o Rei Ezequias",
-  "Pão de Cevada: o alimento da multiplicação de Jesus",
-  "Ensopado dos Profetas: a refeição restauradora de Eliseu",
-  "Bebida de Mel e Ervas: o elixir do deserto de João Batista",
-  "Peixe assado da Galileia: a refeição preparada por Jesus",
-  "Tâmaras Recheadas: a sobremesa digna de reis",
-  "Hummus dos Peregrinos: a pasta de Rute e Boaz",
-  "Cordeiro da Páscoa: a refeição que libertou um povo",
-  "Salada das Sete Espécies: os frutos da Terra Prometida",
-  "Manjar de Leite e Mel: a celebração da promessa cumprida",
-  "+ 9 receitas exclusivas que você precisa conhecer",
-  "Modo de preparo passo a passo, simples e prático",
-  "Ingredientes adaptados ao mercado brasileiro",
-  "Explicação científica de POR QUE cada combinação funciona",
-  "Reflexão espiritual profunda para cada receita",
-];
-
-function Conteudo() {
-  return (
-    <section id="conteudo" className="py-20 md:py-28 px-6 bg-white">
-      <div className="max-w-5xl mx-auto">
-        <div className="text-center mb-14">
-          <p className="font-sans uppercase tracking-[0.3em] text-xs md:text-sm text-secondary mb-4">
-            Tudo o que você vai receber
-          </p>
-          <h2 className="font-display font-bold text-3xl md:text-5xl text-foreground text-balance leading-tight">
-            Confira aqui{" "}
-            <span className="text-secondary">tudo que você terá acesso</span>
-            <br />
-            com A Mesa dos Profetas:
-          </h2>
-          <div className="gold-divider mt-6" />
-        </div>
-
-        <div className="bg-gradient-to-br from-background to-white border-2 border-accent/20 rounded-3xl p-6 md:p-10 shadow-2xl">
-          <ul className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {CONTEUDO.map((item) => (
-              <li key={item} className="flex items-start gap-3">
-                <span className="flex-shrink-0 mt-0.5 w-6 h-6 rounded-full bg-accent flex items-center justify-center">
-                  <Check className="w-4 h-4 text-white" strokeWidth={3} />
-                </span>
-                <span className="font-sans text-foreground/90 leading-relaxed">
-                  {item}
-                </span>
-              </li>
-            ))}
-          </ul>
-        </div>
-
-        <p className="font-sans text-base text-muted text-center mt-8 max-w-2xl mx-auto">
-          Pode imprimir o PDF ou ler no celular — aumente o tamanho da letra no
-          aplicativo de leitura.
-        </p>
-        <div className="text-center mt-10">
-          <CTA variant="primary" showTrust>
-            Garantir acesso vitalício por R$ {PRICE_TO}
             <ArrowRight className="w-5 h-5" />
           </CTA>
         </div>
@@ -953,10 +1061,35 @@ function Bonus() {
           ))}
         </div>
 
+        <div className="mt-14 pt-12 border-t border-white/15">
+          <p className="font-sans text-sm font-semibold text-accent text-center mb-6 uppercase tracking-wider">
+            Em breve — novos bônus exclusivos
+          </p>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {BONUS_FUTUROS.map((b) => (
+              <div
+                key={b.titulo}
+                className="rounded-2xl border border-white/20 bg-white/5 p-5 opacity-80"
+              >
+                <div className="flex items-center gap-2 mb-3">
+                  <Lock className="w-4 h-4 text-accent" />
+                  <span className="text-xs font-sans uppercase tracking-wider text-white/70">
+                    Em breve
+                  </span>
+                </div>
+                <h4 className="font-display font-bold text-lg text-white">
+                  {b.titulo}
+                </h4>
+                <p className="font-sans text-sm text-white/70 mt-2">{b.desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+
         <div className="text-center mt-12">
           <CTA variant="huge" showTrust>
             <Gift className="w-5 h-5" />
-            Resgatar ebook + 3 presentes por R$ {PRICE_TO}
+            Quero Acessar A Mesa dos Profetas
             <ArrowRight className="w-5 h-5" />
           </CTA>
           <p className="mt-4 font-sans text-sm text-white/70">
@@ -969,125 +1102,103 @@ function Bonus() {
   );
 }
 
-const DIFERENCIAIS = [
-  {
-    icon: BookOpen,
-    title: "Sabedoria Milenar",
-    desc: "Cada receita vem com sua história bíblica completa: versículo, contexto e reflexão espiritual profunda.",
-  },
-  {
-    icon: Microscope,
-    title: "Base Científica Sólida",
-    desc: "Explicação nutricional moderna do POR QUE cada combinação ancestral funciona. Fé e ciência em harmonia.",
-  },
-  {
-    icon: Utensils,
-    title: "Aplicação 100% Prática",
-    desc: "Ingredientes encontrados em qualquer mercado brasileiro. Preparo passo a passo, simples e acessível.",
-  },
-];
+function AutoridadeSection() {
+  const stats = [
+    { label: "Inscritos", value: YOUTUBE.subscribers },
+    { label: "Visualizações", value: YOUTUBE.totalViews },
+    ...(YOUTUBE.videoCount
+      ? [{ label: "Vídeos", value: YOUTUBE.videoCount }]
+      : []),
+  ].filter((s) => s.value);
 
-function Diferenciais() {
   return (
-    <section className="py-20 md:py-28 px-6 bg-white">
-      <div className="max-w-6xl mx-auto">
-        <div className="text-center mb-14">
-          <p className="font-sans uppercase tracking-[0.3em] text-xs md:text-sm text-secondary mb-4">
-            Por que este ebook é diferente
-          </p>
-          <h2 className="font-display font-bold text-3xl md:text-5xl text-foreground text-balance leading-tight">
-            Mais que receitas.{" "}
-            <span className="text-secondary">Uma experiência sagrada.</span>
-          </h2>
-          <div className="gold-divider mt-6" />
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          {DIFERENCIAIS.map(({ icon: Icon, title, desc }) => (
-            <div
-              key={title}
-              className="group text-center bg-background/60 rounded-2xl p-8 border-2 border-transparent hover:border-accent hover:shadow-2xl transition-all duration-300"
-            >
-              <div className="w-16 h-16 rounded-full bg-accent flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform duration-300">
-                <Icon className="w-8 h-8 text-white" strokeWidth={1.75} />
-              </div>
-              <h3 className="font-display font-bold text-2xl text-foreground">
-                {title}
-              </h3>
-              <p className="font-sans text-muted mt-4 leading-relaxed">
-                {desc}
-              </p>
-            </div>
-          ))}
-        </div>
-      </div>
-    </section>
-  );
-}
-
-function SobreAutor() {
-  return (
-    <section className="py-20 md:py-28 px-6 bg-background">
+    <section id="autoridade" className="py-20 md:py-28 px-6 bg-background">
       <div className="max-w-6xl mx-auto">
         <div className="text-center mb-12">
           <p className="font-sans text-sm font-semibold text-secondary mb-4 tracking-wide">
             Quem está por trás
           </p>
-          <h2 className="font-display font-bold text-3xl md:text-5xl text-foreground text-balance leading-tight">
-            Quem é{" "}
-            <span className="text-secondary">Enzo Almeida Verde</span>
+          <h2 className="font-display font-bold text-3xl md:text-4xl lg:text-5xl text-foreground text-balance leading-tight">
+            Conheça o canal{" "}
+            <span className="text-secondary">{YOUTUBE.channelName}</span>
           </h2>
           <div className="gold-divider mt-6" />
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-10 items-center">
-          <div className="lg:col-span-1">
-            <div className="relative aspect-[3/4] rounded-3xl overflow-hidden bg-gradient-to-br from-foreground via-secondary to-accent flex items-center justify-center shadow-2xl">
-              <div className="text-center text-white p-8">
-                <p className="font-display font-extrabold text-7xl">EAV</p>
-                <p className="font-sans text-lg mt-4 text-white/90">
-                  Enzo Almeida Verde
-                </p>
-                <p className="font-sans text-sm mt-4 text-white/80">
-                  Autor, pesquisador e curador
-                </p>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 items-start">
+          <div className="bg-white rounded-3xl p-8 md:p-10 border-2 border-accent/20 shadow-lg">
+            <div className="flex items-center gap-4 mb-6">
+              <div className="w-14 h-14 rounded-full bg-red-600 flex items-center justify-center flex-shrink-0">
+                <Youtube className="w-8 h-8 text-white" />
+              </div>
+              <div>
+                <h3 className="font-display font-bold text-2xl text-foreground">
+                  {YOUTUBE.channelName}
+                </h3>
+                <p className="font-sans text-sm text-muted">YouTube</p>
               </div>
             </div>
+            <p className="font-sans text-base md:text-lg text-foreground/85 leading-relaxed">
+              {YOUTUBE.tagline}
+            </p>
+            <p className="font-sans text-base text-foreground/85 mt-4 leading-relaxed">
+              Se você já acompanha nossos vídeos, este ebook é a{" "}
+              <strong>continuação prática</strong> — receitas completas para levar
+              os princípios bíblicos para a sua cozinha.
+            </p>
+            <a
+              href={YOUTUBE.channelUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 mt-6 min-h-[48px] px-6 py-3 rounded-full bg-foreground text-accent font-sans font-semibold hover:bg-secondary transition-colors"
+            >
+              <Youtube className="w-5 h-5" />
+              Visitar o canal no YouTube
+            </a>
           </div>
 
-          <div className="lg:col-span-2 space-y-5">
-            <p className="font-serif text-lg md:text-xl text-foreground leading-relaxed">
-              <strong className="font-sans not-italic">Pesquisador apaixonado pela conexão entre fé, história e nutrição</strong>, Enzo passou anos mergulhado nas Escrituras e na literatura nutricional buscando entender por que os personagens bíblicos viviam vidas tão longas e produtivas.
-            </p>
-
-            <p className="font-serif text-base md:text-lg text-muted leading-relaxed">
-              Ele descobriu que <strong className="text-foreground not-italic">cada alimento mencionado na Bíblia foi escolhido com propósito divino</strong> — não por acaso. Cada combinação ancestral é uma obra-prima nutricional que a ciência moderna está apenas começando a entender.
-            </p>
-
-            <blockquote className="border-l-4 border-accent pl-6 py-2 my-6">
-              <p className="font-serif italic text-lg md:text-xl text-foreground leading-relaxed">
-                "Este livro é resultado de uma jornada profunda pela história bíblica, nutrição ancestral e espiritualidade. Cada receita foi cuidadosamente pesquisada e adaptada para trazer os segredos alimentares dos profetas até a sua mesa moderna."
-              </p>
-              <cite className="block mt-3 font-sans text-sm uppercase tracking-widest text-secondary not-italic">
-                — Enzo Almeida Verde
-              </cite>
-            </blockquote>
-
-            <div className="flex flex-wrap gap-3 pt-4">
-              {[
-                "+ 1.000 Leitores",
-                "21 Receitas Testadas",
-                "48 Páginas de Conteúdo",
-                "Edição Premium",
-              ].map((t) => (
-                <span
-                  key={t}
-                  className="inline-flex items-center gap-2 bg-white border border-accent/30 text-foreground font-sans text-sm font-medium px-4 py-1.5 rounded-full"
+          <div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8">
+              {stats.map((s) => (
+                <div
+                  key={s.label}
+                  className="bg-white rounded-2xl p-5 text-center border border-accent/20"
                 >
-                  <Check className="w-4 h-4 text-accent" />
-                  {t}
-                </span>
+                  <p className="font-sans text-xs uppercase tracking-wider text-muted">
+                    {s.label}
+                  </p>
+                  <p className="font-display font-bold text-lg md:text-xl text-foreground mt-2 leading-snug">
+                    {s.value}
+                  </p>
+                </div>
               ))}
+            </div>
+
+            <div className="bg-white rounded-3xl p-8 border-l-4 border-accent">
+              <h3 className="font-display font-bold text-2xl text-foreground">
+                Enzo Almeida Verde
+              </h3>
+              <p className="font-sans text-sm text-secondary mt-1">
+                Autor, pesquisador e curador
+              </p>
+              <p className="font-sans text-base text-foreground/85 mt-4 leading-relaxed">
+                Pesquisador da conexão entre fé, história e nutrição. Cada receita
+                foi adaptada para ingredientes brasileiros comuns, sem complicação
+                desnecessária.
+              </p>
+              <div className="flex flex-wrap gap-2 mt-6">
+                {["21 receitas testadas", "48 páginas", "Edição premium"].map(
+                  (t) => (
+                    <span
+                      key={t}
+                      className="inline-flex items-center gap-1.5 bg-background px-3 py-1.5 rounded-full text-sm font-sans text-foreground"
+                    >
+                      <Check className="w-4 h-4 text-accent" />
+                      {t}
+                    </span>
+                  )
+                )}
+              </div>
             </div>
           </div>
         </div>
@@ -1227,7 +1338,7 @@ function Testemunhos() {
           <div className="gold-divider mt-6" />
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
           <DepoimentoCard {...TESTEMUNHO_DESTAQUE} destaque />
         </div>
 
@@ -1247,35 +1358,34 @@ function Testemunhos() {
 }
 
 const ANTES = [
-  "Pão branco refinado que dá pico de açúcar",
-  "Dietas restritivas que nunca duram",
-  "Refeições sem propósito espiritual",
-  "Suplementos caros e sem resultado",
-  "Cansaço constante e mente nublada",
-  "Mesa sem comunhão familiar",
+  "Confusão sobre o que comer de verdade",
+  "Dependência de alimentos ultraprocessados",
+  "Falta de inspiração para cozinhar em casa",
+  "Refeições rápidas, sem propósito espiritual",
+  "Cansaço, inflamação e digestão pesada",
+  "Mesa distante dos princípios bíblicos",
 ];
 
 const DEPOIS = [
-  "Pão de Ezequiel: proteína completa e nutritiva",
-  "Plano bíblico simples que cabe na sua rotina",
-  "Cada refeição vira oração e gratidão",
-  "Alimentos reais, naturais e acessíveis",
-  "Energia constante e clareza mental",
-  "Mesa como altar de fé e união",
+  "Receitas naturais com passo a passo claro",
+  "Ingredientes simples do supermercado comum",
+  "Alimentação mais consciente e organizada",
+  "Conexão entre fé e cada refeição",
+  "Mais energia e leveza no dia a dia",
+  "Família reunida em torno da mesa com propósito",
 ];
 
-function AntesDepois() {
+function TransformacaoSection() {
   return (
-    <section className="py-20 md:py-28 px-6 bg-background">
+    <section id="transformacao" className="py-20 md:py-28 px-6 bg-background">
       <div className="max-w-5xl mx-auto">
         <div className="text-center mb-14">
           <p className="font-sans uppercase tracking-[0.3em] text-xs md:text-sm text-secondary mb-4">
             A transformação
           </p>
-          <h2 className="font-display font-bold text-3xl md:text-5xl text-foreground text-balance leading-tight">
-            Sua mesa{" "}
-            <span className="text-secondary">antes e depois</span>{" "}
-            do ebook
+          <h2 className="font-display font-bold text-3xl md:text-4xl lg:text-5xl text-foreground text-balance leading-tight">
+            A transformação que sua{" "}
+            <span className="text-secondary">mesa pode viver</span>
           </h2>
           <div className="gold-divider mt-6" />
         </div>
@@ -1327,90 +1437,79 @@ function AntesDepois() {
             </div>
           </div>
         </div>
+
+        <div className="text-center mt-12">
+          <CTA variant="primary" showTrust>
+            Quero Acessar A Mesa dos Profetas
+            <ArrowRight className="w-5 h-5" />
+          </CTA>
+        </div>
       </div>
     </section>
   );
 }
 
-function PrecoOferta() {
+function OfertaSection() {
   return (
     <section
-      id="preco"
+      id="oferta"
       className="py-20 md:py-28 px-6 text-white relative overflow-hidden"
       style={{
         background:
           "linear-gradient(135deg, #3D2817 0%, #5C3A22 50%, #C67C4E 100%)",
       }}
     >
-      <div className="max-w-3xl mx-auto text-center">
-        <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-accent/25 border border-accent/50 text-accent text-sm sm:text-base font-sans font-semibold mb-6">
-          <Gift className="w-4 h-4" />
-          Pacote completo com valor especial de hoje
-        </span>
-
-        <h2 className="font-display font-extrabold text-3xl md:text-5xl lg:text-6xl text-white leading-tight text-balance">
-          O pacote completo custaria{" "}
-          <span className="text-accent">R$ 238</span>
-          <br />
-          separado. Hoje: R$ {PRICE_TO}.
-        </h2>
-
-        <p className="font-sans text-lg md:text-xl text-white/90 mt-6 max-w-2xl mx-auto leading-relaxed">
-          Ebook (R$ {PRICE_FROM}) + plano de 7 dias (R$ 47) + lista de compras (R$ 27) + guia dos alimentos (R$ 37) —{" "}
-          <strong>um único pagamento, acesso para sempre.</strong>
-        </p>
-
-        <div className="my-12 bg-white text-foreground rounded-3xl p-8 md:p-12 shadow-2xl border-4 border-accent">
-          <p className="font-sans text-base font-medium text-secondary">
-            Pague uma vez e use para sempre
+      <div className="max-w-5xl mx-auto">
+        <div className="text-center mb-12">
+          <p className="font-sans text-sm font-semibold text-accent mb-4 tracking-wide uppercase">
+            Sua oferta completa
           </p>
-          <p className="font-sans line-through text-2xl md:text-3xl text-muted mt-3">
-            De R$ {PRICE_FROM},00
-          </p>
-          <p className="font-display font-extrabold text-6xl md:text-8xl text-foreground mt-2 leading-none">
-            R${PRICE_TO}
-            <span className="text-2xl md:text-4xl text-secondary">,00</span>
-          </p>
-          <p className="font-sans text-base md:text-lg text-foreground mt-4">
-            ou <strong>{INSTALLMENTS_COUNT}x de R$ {PRICE_INSTALLMENTS}</strong> no cartão
-          </p>
-
-          <div className="mt-8 flex flex-wrap items-center justify-center gap-3 text-sm">
-            <span className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-accent/15 text-foreground rounded-full">
-              <Check className="w-4 h-4 text-accent" /> Acesso vitalício
-            </span>
-            <span className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-accent/15 text-foreground rounded-full">
-              <Check className="w-4 h-4 text-accent" /> 3 bônus grátis
-            </span>
-            <span className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-accent/15 text-foreground rounded-full">
-              <Check className="w-4 h-4 text-accent" /> Garantia 7 dias
-            </span>
-          </div>
-
-          <UrgencyCountdownBlock variant="card" />
-
-          <div className="mt-8">
-            <CTA variant="huge" showTrust className="w-full">
-              <Gift className="w-5 h-5" />
-              Quero o guia completo por R$ {PRICE_TO}
-              <ArrowRight className="w-5 h-5" />
-            </CTA>
-          </div>
-
-          <div className="mt-6 flex items-center justify-center gap-4 text-xs font-sans text-muted">
-            <span className="inline-flex items-center gap-1.5">
-              <CreditCard className="w-4 h-4" /> Cartão · Pix · Boleto
-            </span>
-            <span className="inline-flex items-center gap-1.5">
-              <ShieldCheck className="w-4 h-4" /> 100% Seguro
-            </span>
-          </div>
+          <h2 className="font-display font-extrabold text-3xl md:text-4xl lg:text-5xl leading-tight text-balance">
+            Você recebe tudo isso{" "}
+            <span className="text-accent">por um único pagamento</span>
+          </h2>
+          <div className="gold-divider mt-6" />
         </div>
 
-        <p className="font-sans text-white/80 text-sm md:text-base max-w-xl mx-auto">
-          Enquanto você hesita, outra família já está preparando o pão de Ezequiel.{" "}
-          <strong className="text-accent">R$ {PRICE_TO}</strong> é menos que um delivery — e muda sua mesa para sempre.
-        </p>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 items-start">
+          <div className="bg-white/10 backdrop-blur rounded-3xl p-8 border border-accent/30">
+            <h3 className="font-display font-bold text-2xl text-white mb-6">
+              O que está incluído:
+            </h3>
+            <ul className="space-y-4">
+              {OFERTA_ITENS.map((item) => (
+                <li
+                  key={item}
+                  className="flex items-start gap-3 font-sans text-base md:text-lg text-white/95"
+                >
+                  <Check className="w-5 h-5 text-accent flex-shrink-0 mt-0.5" />
+                  {item}
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          <div className="bg-white text-foreground rounded-3xl p-8 md:p-10 shadow-2xl border-4 border-accent text-center">
+            <p className="font-sans line-through text-2xl text-muted">
+              De R$ {PRICE_FROM},00
+            </p>
+            <p className="font-display font-extrabold text-6xl md:text-7xl text-foreground mt-2 leading-none">
+              R${PRICE_TO}
+              <span className="text-2xl text-secondary">,00</span>
+            </p>
+            <p className="font-sans text-lg text-foreground mt-4">
+              ou <strong>{INSTALLMENTS_COUNT}x de R$ {PRICE_INSTALLMENTS}</strong>{" "}
+              no cartão
+            </p>
+            <UrgencyCountdownBlock variant="card" />
+            <div className="mt-8">
+              <CTA variant="huge" showTrust>
+                Quero Acessar A Mesa dos Profetas
+                <ArrowRight className="w-5 h-5" />
+              </CTA>
+            </div>
+          </div>
+        </div>
       </div>
     </section>
   );
@@ -1440,9 +1539,12 @@ function Garantia() {
             </h2>
             <div className="gold-divider mt-6" />
 
-            <p className="font-serif italic text-lg md:text-xl text-foreground/85 mt-8 max-w-2xl mx-auto leading-relaxed text-balance">
-              Se nos primeiros 7 dias você não sentir uma transformação real na sua mesa e na sua espiritualidade, basta enviar um e-mail e{" "}
-              <strong className="not-italic text-secondary">devolvemos 100% do seu dinheiro</strong>. Sem perguntas. Sem burocracia. Sem complicações.
+            <p className="font-sans text-lg md:text-xl text-foreground/85 mt-8 max-w-2xl mx-auto leading-relaxed text-balance">
+              7 dias de garantia. Se o conteúdo não atender suas expectativas,
+              você pode solicitar reembolso dentro do prazo —{" "}
+              <strong className="not-italic text-secondary">
+                devolvemos 100% do valor, sem perguntas.
+              </strong>
             </p>
 
             <div className="mt-8 grid grid-cols-1 sm:grid-cols-3 gap-4 max-w-xl mx-auto">
@@ -1469,36 +1571,56 @@ function Garantia() {
 
 const FAQS = [
   {
+    q: "É um livro físico ou digital?",
+    a: "É um ebook digital em PDF. Você recebe por e-mail logo após a compra e pode ler no celular, tablet, computador ou imprimir em casa.",
+  },
+  {
     q: "Como recebo o ebook após a compra?",
-    a: "Imediatamente. Após a confirmação do pagamento pela Hotmart, você recebe um e-mail com o link de acesso em PDF, que pode ser baixado quantas vezes quiser e lido em qualquer dispositivo (celular, tablet, computador, e-reader).",
+    a: "Imediatamente. Após a confirmação do pagamento pela Hotmart, você recebe um e-mail com o link de acesso em PDF.",
+  },
+  {
+    q: "Funciona no celular?",
+    a: "Sim. O PDF abre no navegador ou em apps de leitura. Você pode aumentar o tamanho da letra para ler com conforto — ideal para quem prefere letra grande.",
+  },
+  {
+    q: "Preciso seguir alguma religião específica?",
+    a: "Não. O conteúdo é baseado nas Escrituras e pensado para quem valoriza fé e alimentação natural, independentemente da denominação.",
+  },
+  {
+    q: "As receitas usam ingredientes caros ou difíceis de achar?",
+    a: "Não. Todas foram adaptadas para ingredientes comuns em supermercados e feiras brasileiras — trigo integral, lentilha, figo, azeite, mel, legumes e grãos.",
+  },
+  {
+    q: "Quanto tempo tenho de acesso?",
+    a: "Acesso vitalício. Você baixa o PDF e fica com ele para sempre. Pode imprimir e usar quantas vezes quiser.",
   },
   {
     q: "Quais formas de pagamento são aceitas?",
-    a: `Cartão de crédito (em até ${INSTALLMENTS_COUNT}x de R$ ${PRICE_INSTALLMENTS}), Pix, boleto bancário e PayPal. A página de pagamento é da Hotmart, com criptografia e segurança bancária.`,
+    a: `Cartão de crédito (até ${INSTALLMENTS_COUNT}x de R$ ${PRICE_INSTALLMENTS}), Pix, boleto bancário e PayPal. Checkout seguro pela Hotmart.`,
   },
   {
     q: "O que é um PDF e como abro no celular?",
-    a: "PDF é um arquivo de leitura, como um livro digital. Após a compra, você recebe um link por e-mail. Toque no link no celular — o arquivo abre no navegador ou no app de arquivos. Você pode aumentar o tamanho da letra na tela ou imprimir em casa.",
+    a: "PDF é um arquivo de leitura, como um livro digital. Toque no link do e-mail — o arquivo abre no navegador ou no app de arquivos do seu celular.",
   },
   {
     q: "Não recebi o e-mail. O que faço?",
-    a: `Confira a caixa de spam e lixeira. O e-mail costuma vir da Hotmart em poucos minutos após o Pix ou cartão aprovado. Se não achar, escreva para ${SUPPORT_EMAIL} ou chame no WhatsApp pelo botão verde no canto da tela.`,
+    a: `Confira spam e lixeira. Se não achar, escreva para ${SUPPORT_EMAIL} ou chame no WhatsApp pelo botão verde na tela.`,
   },
   {
     q: "Existe garantia? E se eu não gostar?",
-    a: "Sim. Você tem 7 dias de garantia incondicional. Se não gostar do conteúdo por qualquer motivo, basta enviar um e-mail solicitando o reembolso e ele será processado integralmente — sem perguntas, sem burocracia.",
+    a: "Sim. 7 dias de garantia incondicional. Se o conteúdo não atender suas expectativas, solicite reembolso dentro do prazo — devolvemos 100%, sem perguntas.",
   },
   {
-    q: "Os ingredientes são fáceis de encontrar no Brasil?",
-    a: "Sim. Todas as receitas usam ingredientes encontrados em supermercados, feiras livres e lojas de produtos naturais brasileiras. A lista de compras vem pronta para você levar ao mercado.",
+    q: "Preciso saber cozinhar bem?",
+    a: "Não. Cada receita tem passo a passo claro, pensado para quem cozinha no dia a dia. Se você sabe ferver água e usar fogão, consegue preparar.",
   },
   {
-    q: "Preciso ter conhecimento culinário avançado?",
-    a: "Não. Cada receita foi pensada para ser preparada por qualquer pessoa, mesmo sem experiência. O passo a passo é claro, simples e direto.",
+    q: "Posso usar em estudo de família ou célula?",
+    a: "Sim. Muitas leitoras usam uma receita por semana, lendo a história bíblica e preparando juntas — funciona muito bem em grupos pequenos.",
   },
   {
-    q: "O acesso é vitalício mesmo?",
-    a: "Sim. Você baixa o PDF e fica com ele para sempre. Pode imprimir, compartilhar com sua família, levar para a igreja. É seu para a vida toda.",
+    q: "Substitui orientação médica ou nutricional?",
+    a: "Não. O ebook é educativo e espiritual. Se você tem condição de saúde (diabetes, alergias etc.), consulte seu médico antes de mudar a alimentação.",
   },
 ];
 
@@ -1595,36 +1717,23 @@ function CTAFinal() {
       <div className="relative max-w-4xl mx-auto text-center">
         <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-accent/20 border border-accent/40 text-accent text-sm sm:text-base font-sans font-semibold mb-6">
           <Heart className="w-4 h-4" />
-          Sua mesa pode mudar ainda esta semana
+          Um convite para sua família
         </span>
 
-        <h2 className="font-display font-extrabold text-3xl md:text-5xl lg:text-6xl text-balance leading-tight">
-          Está a um passo de sentar à mesa
-          <br />
-          <span className="text-accent">como nos tempos bíblicos</span>
+        <h2 className="font-display font-extrabold text-3xl md:text-4xl lg:text-5xl text-balance leading-tight">
+          Durante milhares de anos, famílias se reuniram ao redor da mesa para
+          compartilhar alimento, fé e comunhão.
         </h2>
 
-        <UrgencyCountdownBlock variant="final" />
-
-        <p className="font-sans text-lg md:text-xl text-white/90 mt-8 max-w-2xl mx-auto text-balance leading-relaxed">
-          O guia completo de receitas bíblicas, com presentes de R$ 111, por apenas R${" "}
-          {PRICE_TO} hoje. Amanhã o valor promocional pode não estar mais disponível.
+        <p className="font-serif italic text-lg md:text-2xl text-white/90 mt-8 max-w-2xl mx-auto text-balance leading-relaxed">
+          Agora você também pode trazer esses princípios para dentro da sua
+          casa — com receitas simples, ingredientes do mercado e um passo a passo
+          que respeita sua rotina.
         </p>
-
-        <div className="mt-10 inline-flex flex-col items-center gap-2 px-6 py-5 bg-foreground/40 backdrop-blur border border-accent/40 rounded-2xl">
-          <span className="font-sans text-base text-white/85">Investimento de hoje</span>
-          <span className="font-display font-extrabold text-5xl md:text-6xl text-accent">
-            R$ {PRICE_TO}
-          </span>
-          <span className="font-sans text-base text-white/85">
-            ou {INSTALLMENTS_COUNT}x de R$ {PRICE_INSTALLMENTS}
-          </span>
-        </div>
 
         <div className="mt-10 max-w-lg mx-auto">
           <CTA variant="huge" showTrust>
-            <Gift className="w-5 h-5" />
-            Quero receber o ebook na Hotmart — R$ {PRICE_TO}
+            Quero Receber A Mesa dos Profetas
             <ArrowRight className="w-5 h-5" />
           </CTA>
           <p className="font-sans text-base text-white/75 mt-4 text-center">
@@ -1687,8 +1796,18 @@ function Footer() {
           <h4 className="font-display font-bold text-white mb-4">Navegação</h4>
           <ul className="space-y-2 font-sans text-sm">
             <li>
-              <a href="#para-quem" className="hover:text-accent transition-colors">
+              <a href="#problema" className="hover:text-accent transition-colors">
                 Para quem é
+              </a>
+            </li>
+            <li>
+              <a href="#receitas" className="hover:text-accent transition-colors">
+                Receitas
+              </a>
+            </li>
+            <li>
+              <a href="#oferta" className="hover:text-accent transition-colors">
+                Oferta
               </a>
             </li>
             <li>
@@ -1744,17 +1863,16 @@ export default function Home() {
       <UrgencyBar />
       <SiteNav />
       <Hero />
-      <ComoFunciona />
-      <ParaQuemE />
-      <Conteudo />
+      <ProblemaSection />
+      <TransformacaoSection />
+      <OQueVoceRecebe />
       <Galeria />
-      <Bonus />
-      <Diferenciais />
-      <SobreAutor />
+      <MecanismoUnico />
       <Testemunhos />
-      <AntesDepois />
-      <Story />
-      <PrecoOferta />
+      <AutoridadeSection />
+      <OfertaSection />
+      <Bonus />
+      <ComoFunciona />
       <Garantia />
       <FAQ />
       <CTAFinal />
